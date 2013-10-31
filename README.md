@@ -10,9 +10,9 @@ Requirements
 Platform
 --------
 
-* Windows Server 2008R2
+* Windows Server 2008 R2
 * Windows Server 2012
-* Windows Server 2012R2
+* Windows Server 2012 R2
 
 Cookbooks
 ---------
@@ -75,22 +75,23 @@ Resource/Provider
 
 'driver'
 --------
+**Note** Provided until printer_driver support added to Windows cookbook from opscode.
 
 ### Actions
 - :create: Installs a printer driver
-- :delete: Removes a print driver
+- :remove: Removes a printer driver
 
 ### Attribute Parameters
 - driver_name: name attribute.  Name of the print driver to install.
 - inf_path: Full path to the inf file.
-- version: Default "Type 3 - User Mode"
-- architecture: Chipset of the driver being installed. Default "x64" Options: "x86" or "x64".
+- version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
+- environment: Chipset of the driver being installed. Default "x64" Options: "x86", "x64" or "Itanium".
 
 ### Examples
 
     # Install HP LaserJet 9050 PS driver
     windows_print_driver "HP LaserJet 9050 PS" do
-      action :install
+      action :create
       inf_path "c:\\9050 x64\\hpc9050v.inf"      
     end
 
@@ -99,26 +100,7 @@ Resource/Provider
       action :remove
     end
 
-'papercut'
-----------
 
-### Actions
-- :install: Installs Papercut application.  http://www.papercut.com/
-- :remove: Removes Papercut application.
-
-### Attritube Parameters
-- name: name attribute.  Name of the product.  Current products are "pcng" and "pcmf".
-- version: version of the product.
-- installer_path: Full path to the installer.
-
-## Examples
-
-    # Installs Papercut Multifunction version 13.4.24032
-    windows_print_papercut "pcmf" do
-      version "13.4.24032"
-      installer_path = "c:\\chef\\cookbooks\\windows_print\\files\\default\\"
-      action :install
-    end
 
 Contributing
 ============
