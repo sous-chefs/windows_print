@@ -27,19 +27,19 @@
 require 'mixlib/shellout'
 
 action :create do
-  if exists?
+  if driver_exists?
     Chef::Log.info("#{ new_resource.name } already exists - nothing to do.")
     new_resource.updated_by_last_action(false)
   else
     windows_batch "Creating print driver: #{ new_resource.name }" do
       code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.name }\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version }\" /f \"#{new_resource.inf_path}\""
     end
-  
+    Chef::Log.info("#{ new_resource.name } installed.")
     new_resource.updated_by_last_action(true)
   end
 end
 
-action :remove do
+action :delete do
   if exists?
     windows_batch "Deleting print driver: #{ new_resource.name }" do
       code "rundll32 printui.dll PrintUIEntry /dd /m \"#{new_resource.name}\" /h \"#{new_resource.environment}\" /v \"#{new_resource.version}\""
@@ -52,16 +52,39 @@ action :remove do
   end
 end
   
-def exists?
+def driver_exists?
   case new_resource.environment
   when "x64"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.name},3,Windows x64'} | fl name\"").run_command
+    Chef::Log.info("#{ new_resource.name } x64 driver found.")
   when "x86"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.name},3,Windows NT x86'} | fl name\"").run_command
+        Chef::Log.info("#{ new_resource.name } x86 driver found.")
   when "Itanium"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.name},3,Itanium'} | fl name\"").run_command
+    Chef::Log.info("#{ new_resource.name } xItanium driver found.")
   else
-    Chef::Log.error("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
+    Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
   end
-  check.stdout.include? "#{new_resource.name}"
+  Chef::Log.info(check.stdout)
+  check.stdout.include? new_resource.name
+  Chef::Log.info('some useful information')
+end
+
+# Attempt to prevent typos in new_resource.name
+def driver_name
+  case new_resource.environment
+  when "x64"
+    File.readlines("#{new_resource.inf_path}").grep(/NTamd64/)
+    #Grab Next line String Between " and " and make that new_resource.name
+  when "x86"
+    File.readlines("#{new_resource.inf_path}").grep(/NTx86/)
+    #Grab Next line String Between " and " and make that new_resource.name
+  when "Itanium"
+    File.readlines("#{new_resource.inf_path}").grep(/NTx86/)
+    #Grab Next line String Between " and " and make that new_resource.name
+  else
+    Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
+  end
+  
 end
