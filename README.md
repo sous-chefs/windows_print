@@ -79,7 +79,7 @@ Resource/Provider
 
 ### Actions
 - :create: Installs a printer driver
-- :remove: Removes a printer driver
+- :delete: Removes a printer driver
 
 ### Attribute Parameters
 - driver_name: name attribute.  Name of the print driver to install.
@@ -95,9 +95,9 @@ Resource/Provider
       inf_path "c:\\9050 x64\\hpc9050v.inf"      
     end
 
-    # Remove HP LaserJet 9050 PS driver
+    # Delete HP LaserJet 9050 PS driver
     windows_print_driver "HP LaserJet 9050 PS" do
-      action :remove
+      action :delete
     end
 
 
