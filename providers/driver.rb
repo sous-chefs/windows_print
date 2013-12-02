@@ -28,7 +28,7 @@ require 'mixlib/shellout'
 
 action :create do
   if driver_exists?
-    Chef::Log.info("#{ new_resource.name } already exists - nothing to do.")
+    Chef::Log.info("#{ new_resource.name } already installed - nothing to do.")
     new_resource.updated_by_last_action(false)
   else
     windows_batch "Creating print driver: #{ new_resource.name }" do
@@ -66,9 +66,7 @@ def driver_exists?
   else
     Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
   end
-  Chef::Log.info(check.stdout)
   check.stdout.include? new_resource.name
-  Chef::Log.info('some useful information')
 end
 
 # Attempt to prevent typos in new_resource.name
