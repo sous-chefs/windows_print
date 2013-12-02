@@ -100,7 +100,30 @@ Resource/Provider
       action :delete
     end
 
+'port'
+--------
+**Note** Replacement for printer_port provider in the Windows cookbook from opscode.  Allows creation of ports based on name rather than IP Address
 
+### Actions
+- :create: Installs a printer port
+- :delete: Removes a printer port
+
+### Attribute Parameters
+- name: name attribute.  Name of the port to install.
+- ipv4_address: IPv4 address of the printer port
+
+### Examples
+
+    # Install PrinterPort1 port @ 10.0.0.50
+    windows_print_port "PrinterPort1" do
+      action :create
+      ipv4_address "10.0.0.50"
+    end
+
+    # Deletes PrinterPort1 port
+    windows_print_port "PrinterPort1" do
+      action :delete
+    end
 
 Contributing
 ============
