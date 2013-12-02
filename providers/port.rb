@@ -19,13 +19,31 @@
 #
 
 action :create do
-  powershell "#{new_resource.name}" do
-    code "Add-PrinterPort -Name \"#{new_resource.name}\" -PrinterHostAddress \"#{new_resource.ipv4_address}\""
+  if port_exists?
+    Chef::Log.info{"#{new_resource.name} already created - nothing to do."}
+    new_resource.updated_by_last_action(false)
+  else
+    powershell "#{new_resource.name}" do
+      code "Add-PrinterPort -Name \"#{new_resource.name}\" -PrinterHostAddress \"#{new_resource.ipv4_address}\""
+    end
+  Chef::Log.info("#{new_resource.name} created.")
+  new_resource.updated_by_last_action(true)
   end
 end
 
 action :delete do
-  powershell "#{new_resrouce.name}" do
-    code "Remove_PrinterPort -Name \"#{new_resource.name}\""
+  if port_exists?
+    powershell "#{new_resrouce.name}" do
+      code "Remove_PrinterPort -Name \"#{new_resource.name}\""
+    end
+    new_resrouce.updated_by_last_action(true)
+  else
+    Chef::Log.info("#{new_resource.name} not found - unable to delete.")
+    new_resource.updated_by_last_action(false)
   end
+end
+
+def port_exists?
+  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_TCPIPPrinterPort -EnableAllPrivileges | where {$_.name -like '#{new_resource.name}'} | fl name\"").run_command
+  check.stdout.include? new_resource.name
 end
