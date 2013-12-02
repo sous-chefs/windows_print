@@ -34,7 +34,7 @@ end
 action :delete do
   if port_exists?
     powershell "#{new_resource.name}" do
-      code "Remove_PrinterPort -Name \"#{new_resource.name}\""
+      code "Remove-PrinterPort -Name \"#{new_resource.name}\""
     end
     new_resource.updated_by_last_action(true)
   else
