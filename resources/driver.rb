@@ -1,7 +1,7 @@
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
 # Cookbook Name:: windows_print
-# resource:: print_driver
+# resource:: driver
 #
 # Copyright 2013, Texas A&M
 #

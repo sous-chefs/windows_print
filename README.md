@@ -82,7 +82,7 @@ Resource/Provider
 - :delete: Removes a printer driver
 
 ### Attribute Parameters
-- driver_name: name attribute.  Name of the print driver to install.
+- driver_name: name attribute.  Name of the print driver.
 - inf_path: Full path to the inf file.
 - version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
 - environment: Chipset of the driver being installed. Default "x64" Options: "x86", "x64" or "Itanium".
@@ -102,14 +102,14 @@ Resource/Provider
 
 'port'
 --------
-**Note** Replacement for printer_port provider in the Windows cookbook from opscode.  Allows creation of ports based on name rather than IP Address
+**Note** Replacement for printer_port provider in the Windows cookbook from opscode.  Allows creation of ports based on name rather than IP Address.
 
 ### Actions
 - :create: Installs a printer port
 - :delete: Removes a printer port
 
 ### Attribute Parameters
-- name: name attribute.  Name of the port to install.
+- port_name: name attribute.  Name of the port.
 - ipv4_address: IPv4 address of the printer port
 
 ### Examples
@@ -122,6 +122,42 @@ Resource/Provider
 
     # Deletes PrinterPort1 port
     windows_print_port "PrinterPort1" do
+      action :delete
+    end
+
+'printer'
+--------
+**Note** Replacement for printer provider in the Windows cookbook from opscode.  Uses powershell inplace of registry.  Handles port and driver installation if missing.
+
+### Actions
+- :create: Installs a printer
+- :delete: Removes a printer
+
+### Attribute Parameters
+- printer_name: name attribute.  Name of the printer.
+- port_name: Name of the port.
+- ipv4_address: IPv4 address of the printer port
+- driver_name: Name of the print driver.
+- inf_path: Full path to the inf file.
+- version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
+- environment: Chipset of the driver being installed. Default "x64" Options: "x86", "x64" or "Itanium".
+
+### Examples
+
+    # Install HP LaserJet
+    windows_print_printer "HP LaserJet" do
+      action :create
+      driver_name "HP LaserJet"
+      port_name "HP LaserJet"
+      comment ""
+      ipv4_address "10.0.0.50"
+      inf_path "C:\\chef\\cookbooks\\windows_print\\files\\default\\HP Universal Printing PCL 6 (v5.4)\\x64\\hpcu118u.inf"
+      shared false
+      environment "x64"
+    end
+
+    # Deletes HP LaserJet
+    windows_print_port "HP LaserJet" do
       action :delete
     end
 

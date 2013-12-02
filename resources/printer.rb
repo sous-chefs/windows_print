@@ -1,7 +1,7 @@
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
 # Cookbook Name:: windows_print
-# resource:: port
+# resource:: printers
 #
 # Copyright 2013, Texas A&M
 #
@@ -28,5 +28,13 @@ actions :create, :delete
 
 default_action :create
 
-attribute :port_name, :name_attribute => true, :kind_of => String, :required => true 
+attribute :printer_name, :name_attribute => true, :kind_of => String, :required => true 
+attribute :comment, :kind_of => String
+attribute :shared, :kind_of => [ TrueClass, FalseClass ],
+            :default => false
+attribute :driver_name, :kind_of => String
+attribute :port_name, :kind_of => String
 attribute :ipv4_address, :kind_of => String, :regex => Resolv::IPv4::Regex
+attribute :inf_path, :kind_of => String
+attribute :version, :kind_of => String, :default => "Type 3 - User Mode"
+attribute :environment, :kind_of => String, :default => "x64"

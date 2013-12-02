@@ -1,7 +1,7 @@
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
 # Cookbook Name:: windows_print
-# Provider:: driver
+# Provider:: printer
 #
 # Copyright 2013, Texas A&M
 #
@@ -27,31 +27,58 @@
 require 'mixlib/shellout'
 
 action :create do
-  if driver_exists?
-    Chef::Log.info("#{ new_resource.driver_name } already installed - nothing to do.")
+  if port_exists?
+    Chef::Log.info{"#{new_resource.port_name} already created - checking driver."}
     new_resource.updated_by_last_action(false)
   else
-    windows_batch "Creating print driver: #{new_resource.driver_name}" do
-      code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name }\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version }\" /f \"#{new_resource.inf_path}\""
+    windows_print_port "#{new_resource.port_name}" do
+      ipv4_address "#{new_resource.ip_address}"
     end
-    Chef::Log.info("#{ new_resource.driver_name } installed.")
+    
+    Chef::Log.info{"#{new_resource.port_name} created."}
     new_resource.updated_by_last_action(true)
+  end
+  
+  if driver_exists?
+    Chef::Log.info{"#{new_resource.driver_name} already created - installing printer."}
+    new_resource.updated_by_last_action(false)
+  else
+    windows_print_driver "#{new_resource.driver_name}" do
+      inf_path "#{new_resource.inf_path}"
+    end
+    
+    Chef::Log.info{"#{new_resource.driver_name} created."}
+    new_resource.updated_by_last_action(true)
+  end
+      
+  if printer_exists?
+    Chef::Log.info{"#{new_resource.name} already created - nothing to do."}
+    new_resource.updated_by_last_action(false)
+  else
+    powershell "#{new_resource.name}" do
+      code "Add-Printer -Name \"#{new_resource.name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\"" 
+    end
   end
 end
 
 action :delete do
-  if exists?
-    windows_batch "Deleting print driver: #{new_resource.driver_name}" do
-      code "rundll32 printui.dll PrintUIEntry /dd /m \"#{new_resource.driver_name}\" /h \"#{new_resource.environment}\" /v \"#{new_resource.version}\""
+  if printer_exists?
+    powershell "#{new_resource.name}" do
+      code "Remove-Printer -Name \"#{new_resource.name}\""
     end
-
     new_resource.updated_by_last_action(true)
   else
-    Chef::Log.info("#{ new_resource.driver_name } doesn't exist - can't delete.")
+    Chef::Log.info("#{new_resource.name} not found - unable to delete.")
     new_resource.updated_by_last_action(false)
   end
 end
-  
+
+def port_exists?
+  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_TCPIPPrinterPort -EnableAllPrivileges | where {$_.name -like '#{new_resource.port_name}'} | fl name\"").run_command
+  check.stdout.include? new_resource.port_name
+  #windows_print_port.run_action(port_exists?)
+end
+
 def driver_exists?
   case new_resource.environment
   when "x64"
@@ -67,22 +94,10 @@ def driver_exists?
     Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
   end
   check.stdout.include? new_resource.driver_name
+  #windows_print_driver.run_action(driver_exists?)
 end
 
-# Attempt to prevent typos in new_resource.name
-def driver_name
-  case new_resource.environment
-  when "x64"
-    File.readlines("#{new_resource.inf_path}").grep(/NTamd64/)
-    #Grab Next line String Between " and " and make that new_resource.name
-  when "x86"
-    File.readlines("#{new_resource.inf_path}").grep(/NTx86/)
-    #Grab Next line String Between " and " and make that new_resource.name
-  when "Itanium"
-    File.readlines("#{new_resource.inf_path}").grep(/NTx86/)
-    #Grab Next line String Between " and " and make that new_resource.name
-  else
-    Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
-  end
-  
+def printer_exists?
+  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.name}'} | fl name\"").run_command
+  check.stdout.include? new_resource.name
 end
