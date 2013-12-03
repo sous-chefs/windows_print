@@ -28,14 +28,25 @@ require 'mixlib/shellout'
 
 action :create do
   if driver_exists?
-    Chef::Log.info("#{ new_resource.driver_name } already installed - nothing to do.")
+    Chef::Log.info("#{new_resource.driver_name} already installed - nothing to do.")
     new_resource.updated_by_last_action(false)
   else
-    windows_batch "Creating print driver: #{new_resource.driver_name}" do
-      code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name }\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version }\" /f \"#{new_resource.inf_path}\""
+    windows_batch "Create Local Cache" do
+      code "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
     end
+
+    path = Dir["C:/chef/cache/#{new_resource.driver_name}/*.inf"]
+    inf_file = path.to_s.split("/").last.chop.chop
+    windows_batch "Creating print driver: #{new_resource.driver_name}" do
+      code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{inf_file}\""
+    end
+
     Chef::Log.info("#{ new_resource.driver_name } installed.")
     new_resource.updated_by_last_action(true)
+    
+    windows_batch "Cleanup" do
+      code "rmdir \"C:\\chef\\cache\\#{new_resource.driver_name}\" /S /Q"
+    end
   end
 end
 
