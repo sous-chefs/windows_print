@@ -34,11 +34,8 @@ action :create do
     windows_batch "Create Local Cache" do
       code "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
     end
-
-    path = Dir["C:/chef/cache/#{new_resource.driver_name}/*.inf"]
-    inf_file = path.to_s.split("/").last.chop.chop
     windows_batch "Creating print driver: #{new_resource.driver_name}" do
-      code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{inf_file}\""
+      code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{new_resource.inf_file}\""
     end
 
     Chef::Log.info("#{ new_resource.driver_name } installed.")

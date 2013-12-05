@@ -32,7 +32,7 @@ action :create do
     new_resource.updated_by_last_action(false)
   else
     windows_print_port "#{new_resource.port_name}" do
-      ipv4_address "#{new_resource.ip_address}"
+      ipv4_address "#{new_resource.ipv4_address}"
     end
     
     Chef::Log.info{"#{new_resource.port_name} created."}
@@ -56,7 +56,7 @@ action :create do
     new_resource.updated_by_last_action(false)
   else
     powershell "#{new_resource.name}" do
-      code "Add-Printer -Name \"#{new_resource.name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\"" 
+      code "Add-Printer -Name \"#{new_resource.name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\" -ShareName \"#{new_resource.share_name}\"" 
     end
   end
 end
