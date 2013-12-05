@@ -64,13 +64,13 @@ def driver_exists?
   case new_resource.environment
   when "x64"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows x64'} | fl name\"").run_command
-    Chef::Log.info("#{new_resource.driver_name} x64 driver found.")
+    Chef::Log.info("\"#{new_resource.driver_name}\" x64 driver found.")
   when "x86"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows NT x86'} | fl name\"").run_command
-    Chef::Log.info("#{new_resource.driver_name} x86 driver found.")
+    Chef::Log.info("\"#{new_resource.driver_name}\" x86 driver found.")
   when "Itanium"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Itanium'} | fl name\"").run_command
-    Chef::Log.info("#{new_resource.driver_name} xItanium driver found.")
+    Chef::Log.info("\"#{new_resource.driver_name}\" xItanium driver found.")
   else
     Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
   end

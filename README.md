@@ -129,21 +129,20 @@ Resource/Provider
 
 'printer'
 --------
-**Note** Replacement for printer provider in the Windows cookbook from opscode.  Uses powershell inplace of registry.  Handles port and driver installation if missing.
+**Note** Replacement for printer provider in the Windows cookbook from opscode.  Uses powershell inplace of registry.  Handles port and driver creation if not present.
 
 ### Actions
-- :create: Installs a printer
-- :delete: Removes a printer
+- :create: Creates a printer
+- :delete: Deletes a printer
 
 ### Attribute Parameters
-- printer_name: name attribute.  Name of the printer.
-- comment: Comments section for printer object.
-- location: Location field for printer object.
-- shared: Value to share printer object.  Options: "true" or "false"
+- printer_name: name attribute.  Name of the printer. Required
+- driver_name: Name of the print driver. Required
+- port_name: Name of the port. Required
 - share_name: Shared printer object name.
-- port_name: Name of the port.
+- location: Location field for printer object.
+- comment: Comments section for printer object.
 - ipv4_address: IPv4 address of the printer port
-- driver_name: Name of the print driver.
 - inf_path: Full path to the inf file.
 - inf_file: Name of the inf file.
 - version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
@@ -156,11 +155,16 @@ Resource/Provider
       action :create
       driver_name "HP LaserJet"
       port_name "HP LaserJet"
-      comment ""
+    end
+
+    # Install HP LaserJet, create driver, create port
+    windows_print_printer "HP LaserJet" do
+      action :create
+      driver_name "HP LaserJet"
+      port_name "HP LaserJet"
       ipv4_address "10.0.0.50"
       inf_path "C:\\chef\\cookbooks\\windows_print\\files\\default\\HP Universal Printing PCL 6 (v5.4)\\x64"
       inf_file "hpcu118u.inf"
-      shared false
       environment "x64"
     end
 
@@ -173,7 +177,6 @@ Resource/Provider
       ipv4_address "10.0.0.50"
       inf_path "C:\\chef\\cookbooks\\windows_print\\files\\default\\HP Universal Printing PCL 6 (v5.4)\\x64"
       inf_file "hpcu118u.inf"
-      shared true
       share_name "HP Printer"
       environment "x64"
     end

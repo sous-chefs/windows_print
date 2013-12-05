@@ -28,47 +28,80 @@ require 'mixlib/shellout'
 
 action :create do
   if port_exists?
-    Chef::Log.info{"#{new_resource.port_name} already created - checking driver."}
+    Chef::Log.info{"\"#{new_resource.port_name}\" port already created - checking driver."}
     new_resource.updated_by_last_action(false)
   else
-    windows_print_port "#{new_resource.port_name}" do
-      ipv4_address "#{new_resource.ipv4_address}"
+    Chef::Log.info{"\"#{new_resource.port_name}\" port will be created."}
+    if "#{new_resource.port_name}" == "" or "#{new_resource.ipv4_address}" == ""
+      Chef::Log.info{"Port_name or ipv4_address not provided - port cannot be created."}
+    else
+      windows_print_port "#{new_resource.port_name}" do
+        ipv4_address "#{new_resource.ipv4_address}"
+      end
+      Chef::Log.info{"\"#{new_resource.port_name}\" port created."}
     end
-    
-    Chef::Log.info{"#{new_resource.port_name} created."}
+
     new_resource.updated_by_last_action(true)
   end
   
   if driver_exists?
-    Chef::Log.info{"#{new_resource.driver_name} already created - installing printer."}
+    Chef::Log.info{"\"#{new_resource.driver_name}\" driver already created - checking printer."}
     new_resource.updated_by_last_action(false)
   else
-    windows_print_driver "#{new_resource.driver_name}" do
-      inf_path "#{new_resource.inf_path}"
+    Chef::Log.info{"\"#{new_resource.driver_name}\" driver will be created."}
+    if "#{new_resource.driver_name}" == "" or "#{new_resource.inf_path}" == "" or "#{new_resource.inf_file}" == ""
+      Chef::Log.info{"driver_name or inf_path or inf_file not provided - driver cannot be created."}
+    else
+      windows_print_driver "#{new_resource.driver_name}" do
+        inf_path "#{new_resource.inf_path}"
+        inf_file "#{new_resource.inf_file}"
+      end
     end
     
-    Chef::Log.info{"#{new_resource.driver_name} created."}
+    Chef::Log.info{"\"#{new_resource.driver_name}\" driver created."}
     new_resource.updated_by_last_action(true)
   end
       
-  if printer_exists?
-    Chef::Log.info{"#{new_resource.name} already created - nothing to do."}
+  if printer_exists? 
+    Chef::Log.info{"\"#{new_resource.printer_name}\" printer already created - nothing to do."}
     new_resource.updated_by_last_action(false)
   else
-    powershell "#{new_resource.name}" do
-      code "Add-Printer -Name \"#{new_resource.name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\" -ShareName \"#{new_resource.share_name}\"" 
+    if "#{new_resource.port_name}" == "" or "#{new_resource.ipv4_address}" == "" or "#{new_resource.driver_name}" == "" or "#{new_resource.inf_path}" == "" or "#{new_resource.inf_file}" == ""
+      if "#{new_resource.port_name}" == "" or "#{new_resource.ipv4_address}" == ""
+      Chef::Log.info{"Port was not created - Cannot create printer."}
+      end
+      if "#{new_resource.driver_name}" == "" or "#{new_resource.inf_path}" == "" or "#{new_resource.inf_file}" == ""
+      Chef::Log.info{"Driver was not created. - Cannot create printer."}
+      end
+    else
+      Chef::Log.info{"\"#{new_resource.printer_name}\" printer will be created."}
+      cmd = "Add-Printer -Name \"#{new_resource.name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
+
+      if "#{new_resource.share_name}" == ""
+        Chef::Log.info{"\"#{new_resource.printer_name}\" printer will not be shared."}
+      else
+        cmd << " -Shared -ShareName \"#{new_resource.share_name}\""
+        Chef::Log.info{"\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\"."}
+      end
+
+      powershell "#{new_resource.printer_name}" do
+        code cmd
+      end
+
+    Chef::Log.info{"\"#{new_resource.printer_name}\" printer created."}
     end
+    new_resource.updated_by_last_action(true)
   end
 end
 
 action :delete do
   if printer_exists?
-    powershell "#{new_resource.name}" do
-      code "Remove-Printer -Name \"#{new_resource.name}\""
+    powershell "#{new_resource.printer_name}" do
+      code "Remove-Printer -Name \"#{new_resource.printer_name}\""
     end
     new_resource.updated_by_last_action(true)
   else
-    Chef::Log.info("#{new_resource.name} not found - unable to delete.")
+    Chef::Log.info("\"#{new_resource.printer_name}\" printer not found - unable to delete.")
     new_resource.updated_by_last_action(false)
   end
 end
@@ -83,13 +116,13 @@ def driver_exists?
   case new_resource.environment
   when "x64"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows x64'} | fl name\"").run_command
-    Chef::Log.info("#{new_resource.driver_name} x64 driver found.")
+    Chef::Log.info("\"#{new_resource.driver_name}\" x64 driver found.")
   when "x86"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows NT x86'} | fl name\"").run_command
-    Chef::Log.info("#{new_resource.driver_name} x86 driver found.")
+    Chef::Log.info("\"#{new_resource.driver_name}\" x86 driver found.")
   when "Itanium"
     check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Itanium'} | fl name\"").run_command
-    Chef::Log.info("#{new_resource.driver_name} xItanium driver found.")
+    Chef::Log.info("\"#{new_resource.driver_name}\" xItanium driver found.")
   else
     Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
   end
