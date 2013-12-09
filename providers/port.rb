@@ -20,15 +20,19 @@
 require 'mixlib/shellout'
 
 action :create do
-  if port_exists?
-    Chef::Log.info{"#{new_resource.port_name} already created - nothing to do."}
-    new_resource.updated_by_last_action(false)
-  else
-    powershell "#{new_resource.name}" do
-      code "Add-PrinterPort -Name \"#{new_resource.port_name}\" -PrinterHostAddress \"#{new_resource.ipv4_address}\""
+  ports = new_resource.port_name.split(",").map!
+  ports.each do |port|
+    if port_exists?
+      Chef::Log.info{"#{port} already created - nothing to do."}
+      new_resource.updated_by_last_action(false)
+    else
+      powershell "#{port}" do
+        code "Add-PrinterPort -Name \"#{port}\" -PrinterHostAddress \"#{new_resource.ipv4_address}\""
     end
-  Chef::Log.info("#{new_resource.port_name} created.")
-  new_resource.updated_by_last_action(true)
+    
+    Chef::Log.info("#{new_resource.port_name} created.")
+    new_resource.updated_by_last_action(true)
+    end
   end
 end
 
