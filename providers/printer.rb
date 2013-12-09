@@ -31,65 +31,44 @@ action :create do
     Chef::Log.info{"\"#{new_resource.port_name}\" port already created - checking driver."}
     new_resource.updated_by_last_action(false)
   else
-    Chef::Log.info{"\"#{new_resource.port_name}\" port will be created."}
-    if "#{new_resource.port_name}" == "" or "#{new_resource.ipv4_address}" == ""
-      Chef::Log.info{"Port_name or ipv4_address not provided - port cannot be created."}
-    else
-      windows_print_port "#{new_resource.port_name}" do
-        ipv4_address "#{new_resource.ipv4_address}"
-      end
-      Chef::Log.info{"\"#{new_resource.port_name}\" port created."}
+    windows_print_port "#{new_resource.port_name}" do
+      ipv4_address "#{new_resource.ipv4_address}"
     end
-
+    Chef::Log.info{"\"#{new_resource.port_name}\" port created."}
     new_resource.updated_by_last_action(true)
   end
-  
+
   if driver_exists?
     Chef::Log.info{"\"#{new_resource.driver_name}\" driver already created - checking printer."}
     new_resource.updated_by_last_action(false)
   else
-    Chef::Log.info{"\"#{new_resource.driver_name}\" driver will be created."}
-    if "#{new_resource.driver_name}" == "" or "#{new_resource.inf_path}" == "" or "#{new_resource.inf_file}" == ""
-      Chef::Log.info{"driver_name or inf_path or inf_file not provided - driver cannot be created."}
-    else
-      windows_print_driver "#{new_resource.driver_name}" do
-        inf_path "#{new_resource.inf_path}"
-        inf_file "#{new_resource.inf_file}"
-      end
+    windows_print_driver "#{new_resource.driver_name}" do
+      inf_path "#{new_resource.inf_path}"
+      inf_file "#{new_resource.inf_file}"
     end
-    
+
     Chef::Log.info{"\"#{new_resource.driver_name}\" driver created."}
     new_resource.updated_by_last_action(true)
   end
-      
+
   if printer_exists? 
     Chef::Log.info{"\"#{new_resource.printer_name}\" printer already created - nothing to do."}
     new_resource.updated_by_last_action(false)
   else
-    if "#{new_resource.port_name}" == "" or "#{new_resource.ipv4_address}" == "" or "#{new_resource.driver_name}" == "" or "#{new_resource.inf_path}" == "" or "#{new_resource.inf_file}" == ""
-      if "#{new_resource.port_name}" == "" or "#{new_resource.ipv4_address}" == ""
-      Chef::Log.info{"Port was not created - Cannot create printer."}
-      end
-      if "#{new_resource.driver_name}" == "" or "#{new_resource.inf_path}" == "" or "#{new_resource.inf_file}" == ""
-      Chef::Log.info{"Driver was not created. - Cannot create printer."}
-      end
+    cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
+
+    if "#{new_resource.share_name}" == ""
+      Chef::Log.info{"\"#{new_resource.printer_name}\" printer will not be shared."}
     else
-      Chef::Log.info{"\"#{new_resource.printer_name}\" printer will be created."}
-      cmd = "Add-Printer -Name \"#{new_resource.name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
+      cmd << " -Shared -ShareName \"#{new_resource.share_name}\""
+      Chef::Log.info{"\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\"."}
+    end
 
-      if "#{new_resource.share_name}" == ""
-        Chef::Log.info{"\"#{new_resource.printer_name}\" printer will not be shared."}
-      else
-        cmd << " -Shared -ShareName \"#{new_resource.share_name}\""
-        Chef::Log.info{"\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\"."}
-      end
-
-      powershell "#{new_resource.printer_name}" do
-        code cmd
-      end
+    powershell "#{new_resource.printer_name}" do
+      code cmd
+    end
 
     Chef::Log.info{"\"#{new_resource.printer_name}\" printer created."}
-    end
     new_resource.updated_by_last_action(true)
   end
 end
