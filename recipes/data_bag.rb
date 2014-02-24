@@ -29,9 +29,9 @@ Chef::Log.error('Data bag cannot be empty') if printers.empty?
 
 printers.each do |printer|
 
-  printer_info = data_bag_item(printers)
+  printer_info = data_bag_item('printers', printer)
 
-  bind_zone zone do
+  windows_print_printer(printer) do
     action [:create]
     printer_name printer_info['printer_name']
     share_name printer_info['share_name']
