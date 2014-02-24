@@ -1,8 +1,6 @@
 windows_print Cookbook
 ==============
-This cookbook installs Windows Print and Document Services, handles driver, port and printer installation.
-
-Additionally handles the application install of Papercut
+This cookbook installs Windows Print and Document Services, handles driver, port, and printer installation.
 
 Requirements
 ------------
