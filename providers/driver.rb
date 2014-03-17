@@ -26,7 +26,7 @@
 #
 require 'mixlib/shellout'
 
-action :create do
+action :install do
   if driver_exists?
     Chef::Log.info("#{new_resource.driver_name} already installed - nothing to do.")
     new_resource.updated_by_last_action(false)

@@ -64,7 +64,7 @@ action :create do
       Chef::Log.info{"\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\"."}
     end
 
-    powershell "#{new_resource.printer_name}" do
+    powershell_script "#{new_resource.printer_name}" do
       code cmd
     end
 
@@ -75,7 +75,7 @@ end
 
 action :delete do
   if printer_exists?
-    powershell "#{new_resource.printer_name}" do
+    powershell_script "#{new_resource.printer_name}" do
       code "Remove-Printer -Name \"#{new_resource.printer_name}\""
     end
     new_resource.updated_by_last_action(true)

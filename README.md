@@ -76,7 +76,7 @@ Resource/Provider
 **Note** Provided until printer_driver support added to Windows cookbook from opscode.
 
 ### Actions
-- :create: Installs a printer driver
+- :install: Installs a printer driver
 - :delete: Removes a printer driver
 
 ### Attribute Parameters
@@ -90,7 +90,7 @@ Resource/Provider
 
     # Install HP LaserJet 9050 PS driver
     windows_print_driver "HP LaserJet 9050 PS" do
-      action :create
+      action :install
       inf_path "c:\\9050 x64"      
       inf_file "hpc9050v.inf"
     end

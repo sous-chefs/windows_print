@@ -25,9 +25,9 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-actions :create, :delete
+actions :install, :delete
 
-default_action :create
+default_action :install
 
 attribute :driver_name, :kind_of => String, :name_attribute => true, :required => true
 attribute :inf_path, :kind_of => String, :required => true

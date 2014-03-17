@@ -26,7 +26,7 @@ action :create do
       Chef::Log.info{"#{port} already created - nothing to do."}
       new_resource.updated_by_last_action(false)
     else
-      powershell "#{port}" do
+      powershell_script "#{port}" do
         code "Add-PrinterPort -Name \"#{port}\" -PrinterHostAddress \"#{new_resource.ipv4_address}\""
     end
     
@@ -38,7 +38,7 @@ end
 
 action :delete do
   if port_exists?
-    powershell "#{new_resource.port_name}" do
+    powershell_script "#{new_resource.port_name}" do
       code "Remove-PrinterPort -Name \"#{new_resource.port_name}\""
     end
     new_resource.updated_by_last_action(true)
