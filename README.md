@@ -16,7 +16,6 @@ Cookbooks
 ---------
 
 - Windows - Official windows cookbook from opscode - https://github.com/opscode-cookbooks/windows.git
-- Powershell - Official powershell cookbook form opscode - https://github.com/opscode-cookbooks/powershell
 
 Usage
 -----
@@ -73,7 +72,7 @@ Resource/Provider
 
 'driver'
 --------
-**Note** Provided until printer_driver support added to Windows cookbook from opscode.
+Installs printer driver from inf file.
 
 ### Actions
 - :install: Installs a printer driver
@@ -102,7 +101,7 @@ Resource/Provider
 
 'port'
 --------
-**Note** Replacement for printer_port provider in the Windows cookbook from opscode.  Allows creation of ports based on name rather than IP Address.
+Allows creation of ports based on name rather than IP Address.
 
 ### Actions
 - :create: Installs a printer port
@@ -127,7 +126,7 @@ Resource/Provider
 
 'printer'
 --------
-**Note** Replacement for printer provider in the Windows cookbook from opscode.  Uses powershell inplace of registry.  Handles port and driver creation if not present.
+Allows creation of printer objects.  Handles port and driver creation if not present.
 
 ### Actions
 - :create: Creates a printer
@@ -148,14 +147,14 @@ Resource/Provider
 
 ### Examples
 
-    # Install HP LaserJet
+    # Create HP LaserJet
     windows_print_printer "HP LaserJet" do
       action :create
       driver_name "HP LaserJet"
       port_name "HP LaserJet"
     end
 
-    # Install HP LaserJet, create driver, create port
+    # Create HP LaserJet, create driver, create port
     windows_print_printer "HP LaserJet" do
       action :create
       driver_name "HP LaserJet"
@@ -166,7 +165,7 @@ Resource/Provider
       environment "x64"
     end
 
-    # Install HP LaserJet and share as "HP Printer"
+    # Create HP LaserJet and share as "HP Printer"
     windows_print_printer "HP LaserJet" do
       action :create
       driver_name "HP LaserJet"
