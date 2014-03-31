@@ -27,28 +27,13 @@
 require 'mixlib/shellout'
 
 action :create do
-  if port_exists?
-    Chef::Log.info{"\"#{new_resource.port_name}\" port already created - checking driver."}
-    new_resource.updated_by_last_action(false)
-  else
-    windows_print_port "#{new_resource.port_name}" do
-      ipv4_address "#{new_resource.ipv4_address}"
-    end
-    Chef::Log.info{"\"#{new_resource.port_name}\" port created."}
-    new_resource.updated_by_last_action(true)
+  windows_print_port "#{new_resource.port_name}" do
+    ipv4_address "#{new_resource.ipv4_address}"
   end
 
-  if driver_exists?
-    Chef::Log.info{"\"#{new_resource.driver_name}\" driver already created - checking printer."}
-    new_resource.updated_by_last_action(false)
-  else
-    windows_print_driver "#{new_resource.driver_name}" do
-      inf_path "#{new_resource.inf_path}"
-      inf_file "#{new_resource.inf_file}"
-    end
-
-    Chef::Log.info{"\"#{new_resource.driver_name}\" driver created."}
-    new_resource.updated_by_last_action(true)
+  windows_print_driver "#{new_resource.driver_name}" do
+    inf_path "#{new_resource.inf_path}"
+    inf_file "#{new_resource.inf_file}"
   end
 
   if printer_exists? 
@@ -110,6 +95,7 @@ def driver_exists?
 end
 
 def printer_exists?
-  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.name}'} | fl name\"").run_command
+#  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.name}'} | fl name\"").run_command
+  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | fl name\"").run_command
   check.stdout.include? new_resource.name
 end
