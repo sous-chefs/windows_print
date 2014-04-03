@@ -135,11 +135,10 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
 ### Attribute Parameters
 - printer_name: name attribute.  Name of the printer. Required
 - driver_name: Name of the print driver. Required
-- port_name: Name of the port. Required
+- ports: Name of the port and IPv4 address. Required
 - share_name: Shared printer object name.
 - location: Location field for printer object.
 - comment: Comments section for printer object.
-- ipv4_address: IPv4 address of the printer port
 - inf_path: Full path to the inf file.
 - inf_file: Name of the inf file.
 - version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
@@ -158,8 +157,7 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
     windows_print_printer "HP LaserJet" do
       action :create
       driver_name "HP LaserJet"
-      port_name "HP LaserJet"
-      ipv4_address "10.0.0.50"
+      ports ({ "HP LaserJet" => "10.0.0.50" })
       inf_path "C:\\chef\\cookbooks\\windows_print\\files\\default\\HP Universal Printing PCL 6 (v5.4)\\x64"
       inf_file "hpcu118u.inf"
       environment "x64"
@@ -169,9 +167,22 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
     windows_print_printer "HP LaserJet" do
       action :create
       driver_name "HP LaserJet"
-      port_name "HP LaserJet"
+      ports ({ "HP LaserJet" => "10.0.0.50" })
       comment ""
-      ipv4_address "10.0.0.50"
+      inf_path "C:\\chef\\cookbooks\\windows_print\\files\\default\\HP Universal Printing PCL 6 (v5.4)\\x64"
+      inf_file "hpcu118u.inf"
+      share_name "HP Printer"
+      environment "x64"
+    end
+	
+	# Create HP LaserJet with multiple ports
+    windows_print_printer "HP LaserJet" do
+      action :create
+      driver_name "HP LaserJet"
+      ports ({ "HP LaserJet" => "10.0.0.50",
+               "HP ColorLaserJet" => "10.0.0.51"
+             })
+      comment ""
       inf_path "C:\\chef\\cookbooks\\windows_print\\files\\default\\HP Universal Printing PCL 6 (v5.4)\\x64"
       inf_file "hpcu118u.inf"
       share_name "HP Printer"
