@@ -81,13 +81,13 @@ end
 def driver_name
   case new_resource.environment
   when "x64"
-    File.readlines("#{new_resource.inf_path}").grep(/NTamd64/)
+    File.readlines(new_resource.inf_path).grep(/NTamd64/)
     #Grab Next line String Between " and " and make that new_resource.name
   when "x86"
-    File.readlines("#{new_resource.inf_path}").grep(/NTx86/)
+    File.readlines(new_resource.inf_path).grep(/NTx86/)
     #Grab Next line String Between " and " and make that new_resource.name
   when "Itanium"
-    File.readlines("#{new_resource.inf_path}").grep(/NTx86/)
+    File.readlines(new_resource.inf_path).grep(/NTx86/)
     #Grab Next line String Between " and " and make that new_resource.name
   else
     Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
