@@ -39,9 +39,8 @@ printers.each do |printer|
     inf_file printer_info['inf_file']
     comment printer_info['comment']
     location printer_info['location']
-    ipv4_address printer_info['ipv4_address']
     driver_name printer_info['driver_name']
-    port_name printer_info['port_name']
+    ports printer_info['ports']
     environment printer_info['environment']
   end
 end
