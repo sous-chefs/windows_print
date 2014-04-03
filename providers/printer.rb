@@ -27,8 +27,11 @@
 require 'mixlib/shellout'
 
 action :create do
-  windows_print_port "#{new_resource.port_name}" do
-    ipv4_address "#{new_resource.ipv4_address}"
+
+  new_resource.ports.each do |port_name, ipv4_address|
+    windows_print_port "#{port_name}" do
+      ipv4_address "#{ipv4_address}"
+    end
   end
 
   windows_print_driver "#{new_resource.driver_name}" do
@@ -38,10 +41,16 @@ action :create do
 
   if printer_exists? 
     Chef::Log.info{"\"#{new_resource.printer_name}\" printer already created - nothing to do."}
-    new_resource.updated_by_last_action(false)
   else
-    cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{new_resource.port_name}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
-
+    if new_resource.ports.keys.count > 1
+	  port_list = new_resource.ports.keys.join(",").to_s
+	else
+      port_list = new_resource.ports.keys.to_s
+	end
+	    
+    new_resource.updated_by_last_action(false)
+    cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{port_list}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
+  
     if "#{new_resource.share_name}" == ""
       Chef::Log.info{"\"#{new_resource.printer_name}\" printer will not be shared."}
     else
@@ -68,30 +77,6 @@ action :delete do
     Chef::Log.info("\"#{new_resource.printer_name}\" printer not found - unable to delete.")
     new_resource.updated_by_last_action(false)
   end
-end
-
-def port_exists?
-  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_TCPIPPrinterPort -EnableAllPrivileges | where {$_.name -like '#{new_resource.port_name}'} | fl name\"").run_command
-  check.stdout.include? new_resource.port_name
-  #windows_print_port.run_action(port_exists?)
-end
-
-def driver_exists?
-  case new_resource.environment
-  when "x64"
-    check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows x64'} | fl name\"").run_command
-    Chef::Log.info("\"#{new_resource.driver_name}\" x64 driver found.")
-  when "x86"
-    check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows NT x86'} | fl name\"").run_command
-    Chef::Log.info("\"#{new_resource.driver_name}\" x86 driver found.")
-  when "Itanium"
-    check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Itanium'} | fl name\"").run_command
-    Chef::Log.info("\"#{new_resource.driver_name}\" xItanium driver found.")
-  else
-    Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
-  end
-  check.stdout.include? new_resource.driver_name
-  #windows_print_driver.run_action(driver_exists?)
 end
 
 def printer_exists?
