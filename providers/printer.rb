@@ -46,8 +46,9 @@ action :create do
 	  port_list = new_resource.ports.keys.join(",").to_s
 	else
       port_list = new_resource.ports.keys.to_s
+	  
 	end
-	    
+	port_list = port_list.delete! '"[]' 
     new_resource.updated_by_last_action(false)
     cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{port_list}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
   
