@@ -29,14 +29,14 @@ require 'mixlib/shellout'
 action :create do
 
   new_resource.ports.each do |port_name, ipv4_address|
-    windows_print_port "#{port_name}" do
-      ipv4_address "#{ipv4_address}"
+    windows_print_port "port_name" do
+      ipv4_address "ipv4_address"
     end
   end
 
-  windows_print_driver "#{new_resource.driver_name}" do
-    inf_path "#{new_resource.inf_path}"
-    inf_file "#{new_resource.inf_file}"
+  windows_print_driver "new_resource.driver_name" do
+    inf_path "new_resource.inf_path"
+    inf_file "new_resource.inf_file"
   end
 
   if printer_exists? 
@@ -46,20 +46,20 @@ action :create do
 	  port_list = new_resource.ports.keys.join(",").to_s
 	else
       port_list = new_resource.ports.keys.to_s
-	  
+	  port_list = port_list.delete! '"[]'
 	end
-	port_list = port_list.delete! '"[]' 
+	 
     new_resource.updated_by_last_action(false)
     cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{port_list}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
   
-    if "#{new_resource.share_name}" == ""
+    if "new_resource.share_name" == ""
       Chef::Log.info{"\"#{new_resource.printer_name}\" printer will not be shared."}
     else
       cmd << " -Shared -ShareName \"#{new_resource.share_name}\""
       Chef::Log.info{"\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\"."}
     end
 
-    powershell_script "#{new_resource.printer_name}" do
+    powershell_script "new_resource.printer_name" do
       code cmd
     end
 
@@ -70,7 +70,7 @@ end
 
 action :delete do
   if printer_exists?
-    powershell_script "#{new_resource.printer_name}" do
+    powershell_script "new_resource.printer_name" do
       code "Remove-Printer -Name \"#{new_resource.printer_name}\""
     end
     new_resource.updated_by_last_action(true)
