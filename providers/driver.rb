@@ -31,11 +31,8 @@ action :install do
     Chef::Log.info("#{new_resource.driver_name} already installed - nothing to do.")
     new_resource.updated_by_last_action(false)
   else
-    mount "z:" do
-      action :mount
-      device "#{new_resource.inf_path}"
-      username "#{new_resource.domain_username}"
-      password "#{new_resource.domain_password}"
+    windows_batch "Map Network Drive" do
+      code "net use z: \"#{new_resource.inf_path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
     end
     windows_batch "Create Local Cache" do
       code "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
