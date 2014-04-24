@@ -31,8 +31,17 @@ action :install do
     Chef::Log.info("#{new_resource.driver_name} already installed - nothing to do.")
     new_resource.updated_by_last_action(false)
   else
+    mount "z:" do
+      action :mount
+      device "#{new_resource.inf_path}"
+      username "#{new_resource.domain_username}"
+      password "#{new_resource.domain_password}"
+    end
     windows_batch "Create Local Cache" do
       code "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
+    end
+    windows_batch "Unmap Network Drive" do
+      code "net use z: /d"
     end
     windows_batch "Creating print driver: #{new_resource.driver_name}" do
       code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{new_resource.inf_file}\""

@@ -37,6 +37,8 @@ action :create do
   windows_print_driver "#{new_resource.driver_name}" do
     inf_path "#{new_resource.inf_path}"
     inf_file "#{new_resource.inf_file}"
+    domain_username "#{new_resource.domain_username}"
+    domain_password "#{new_resource.domain_password}"
   end
 
   if printer_exists? 

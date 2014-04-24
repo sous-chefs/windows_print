@@ -84,6 +84,8 @@ Installs printer driver from inf file.
 - inf_file: Name of the inf file.
 - version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
 - environment: Chipset of the driver being installed. Default "x64" Options: "x86", "x64" or "Itanium".
+- domain_username: Domain username to allow mapping network drive for driver installation.
+- domain_password: Password for domain username.
 
 ### Examples
 
@@ -94,33 +96,17 @@ Installs printer driver from inf file.
       inf_file "hpc9050v.inf"
     end
 
+    # Install HP LaserJet 9050 PS driver from network location
+    windows_print_driver "HP LaserJet 9050 PS" do
+      action :install
+      inf_path "\\Netshare\\print drivers\\9050 x64"      
+      inf_file "hpc9050v.inf"
+      domain_username "Chef"
+      domain_password "Password"
+    end
+
     # Delete HP LaserJet 9050 PS driver
     windows_print_driver "HP LaserJet 9050 PS" do
-      action :delete
-    end
-
-'port'
---------
-Allows creation of ports based on name rather than IP Address.
-
-### Actions
-- :create: Installs a printer port
-- :delete: Removes a printer port
-
-### Attribute Parameters
-- port_name: name attribute.  Name of the port.
-- ipv4_address: IPv4 address of the printer port
-
-### Examples
-
-    # Install PrinterPort1 port @ 10.0.0.50
-    windows_print_port "PrinterPort1" do
-      action :create
-      ipv4_address "10.0.0.50"
-    end
-
-    # Deletes PrinterPort1 port
-    windows_print_port "PrinterPort1" do
       action :delete
     end
 
@@ -143,6 +129,8 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
 - inf_file: Name of the inf file.
 - version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
 - environment: Chipset of the driver being installed. Default "x64" Options: "x86", "x64" or "Itanium".
+- domain_username: Domain username to allow mapping network drive for driver installation.
+- domain_password: Password for domain username.
 
 ### Examples
 
@@ -174,8 +162,8 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
       share_name "HP Printer"
       environment "x64"
     end
-	
-	# Create HP LaserJet with multiple ports
+    
+    # Create HP LaserJet with multiple ports
     windows_print_printer "HP LaserJet" do
       action :create
       driver_name "HP LaserJet"
@@ -191,6 +179,31 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
     
     # Deletes HP LaserJet
     windows_print_port "HP LaserJet" do
+      action :delete
+    end
+
+'port'
+--------
+Allows creation of ports based on name rather than IP Address.
+
+### Actions
+- :create: Installs a printer port
+- :delete: Removes a printer port
+
+### Attribute Parameters
+- port_name: name attribute.  Name of the port.
+- ipv4_address: IPv4 address of the printer port
+
+### Examples
+
+    # Install PrinterPort1 port @ 10.0.0.50
+    windows_print_port "PrinterPort1" do
+      action :create
+      ipv4_address "10.0.0.50"
+    end
+
+    # Deletes PrinterPort1 port
+    windows_print_port "PrinterPort1" do
       action :delete
     end
 

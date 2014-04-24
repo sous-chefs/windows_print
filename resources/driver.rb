@@ -34,3 +34,5 @@ attribute :inf_path, :kind_of => String, :required => true
 attribute :inf_file, :kind_of => String, :required => true
 attribute :version, :kind_of => String, :default => "Type 3 - User Mode"
 attribute :environment, :kind_of => String, :default => "x64"
+attribute :domain_username, :kind_of => String
+attribute :domain_password, :kind_of => String
