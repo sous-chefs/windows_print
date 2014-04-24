@@ -29,14 +29,14 @@ require 'mixlib/shellout'
 action :create do
 
   new_resource.ports.each do |port_name, ipv4_address|
-    windows_print_port #{port_name} do
-      ipv4_address #{ipv4_address}
+    windows_print_port "#{port_name}" do
+      ipv4_address "#{ipv4_address}"
     end
   end
 
-  windows_print_driver "new_resource.driver_name" do
-    inf_path "new_resource.inf_path"
-    inf_file "new_resource.inf_file"
+  windows_print_driver "#{new_resource.driver_name}" do
+    inf_path "#{new_resource.inf_path}"
+    inf_file "#{new_resource.inf_file}"
   end
 
   if printer_exists? 
