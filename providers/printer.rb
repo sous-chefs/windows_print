@@ -29,8 +29,8 @@ require 'mixlib/shellout'
 action :create do
 
   new_resource.ports.each do |port_name, ipv4_address|
-    windows_print_port "port_name" do
-      ipv4_address "ipv4_address"
+    windows_print_port #{port_name} do
+      ipv4_address #{ipv4_address}
     end
   end
 
@@ -43,12 +43,12 @@ action :create do
     Chef::Log.info{"\"#{new_resource.printer_name}\" printer already created - nothing to do."}
   else
     if new_resource.ports.keys.count > 1
-	  port_list = new_resource.ports.keys.join(",").to_s
-	else
+      port_list = new_resource.ports.keys.join(",").to_s
+    else
       port_list = new_resource.ports.keys.to_s
-	  port_list = port_list.delete! '"[]'
-	end
-	 
+      port_list = port_list.delete! '"[]'
+    end
+     
     new_resource.updated_by_last_action(false)
     cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{port_list}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
   
@@ -81,7 +81,6 @@ action :delete do
 end
 
 def printer_exists?
-#  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.name}'} | fl name\"").run_command
   check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | fl name\"").run_command
   check.stdout.include? new_resource.name
 end
