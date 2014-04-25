@@ -42,5 +42,7 @@ printers.each do |printer|
     driver_name printer_info['driver_name']
     ports printer_info['ports']
     environment printer_info['environment']
+    domain_username printer_info['domain_username']
+    domain_password printer_info['domain_password']
   end
 end
