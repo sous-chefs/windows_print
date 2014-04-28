@@ -54,7 +54,7 @@ action :create do
     new_resource.updated_by_last_action(false)
     cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{port_list}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
   
-    if "new_resource.share_name" == ""
+    if new_resource.share_name == ""
       Chef::Log.info{"\"#{new_resource.printer_name}\" printer will not be shared."}
     else
       cmd << " -Shared -ShareName \"#{new_resource.share_name}\""
