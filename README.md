@@ -182,6 +182,41 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
       action :delete
     end
 
+'printer_settings'
+------------------
+Creates and restores all printer settings (Printing Defaults)
+
+### Actions
+- :create: Creates a bin file to store settings.
+- :restore: Uses previously created bin file to restore settings.
+
+### Attribute Parameters
+- printer_name: Name of the printer.
+- path: Full path to settings file.
+- file: File name to store settings to.
+- domain_username: Domain username to allow mapping network drive for driver installation.
+- domain_password: Password for domain username.
+
+### Examples
+
+    # Create settings file for "HP LaserJet"
+    windows_print_printer_settings "HP Laserjet" do
+      path "\\\\<server>\\<share>"
+      file "HP LaserJet.bin"
+      action: create
+      domain_username "<domain>\\<username>"
+      domain_password "<Password>"
+    end
+
+    # Retore settings file for "HP LaserJet"
+    windows_print_printer_settings "HP Laserjet" do
+      path "\\\\<server>\\<share>"
+      file "HP LaserJet.bin"
+      action: restore
+      domain_username "<domain>\\<username>"
+      domain_password "<Password>"
+    end
+
 'port'
 --------
 Allows creation of ports based on name rather than IP Address.
