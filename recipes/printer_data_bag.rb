@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: windows_print
-# Recipe:: data_bag
+# Recipe:: printer_data_bag
 #
 # Copyright 2013, Texas A&M
 #
