@@ -31,32 +31,35 @@ action :install do
     Chef::Log.info("#{new_resource.driver_name} already installed - nothing to do.")
     new_resource.updated_by_last_action(false)
   else
-    windows_batch "Map Network Drive" do
-      code "net use z: \"#{new_resource.inf_path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
+    execute "Sanitize Network Drives" do
+      command "net use * /d /y"
     end
-    windows_batch "Create Local Cache" do
-      code "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
+    execute "Map Network Drive" do
+      command "net use z: \"#{new_resource.inf_path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
     end
-    windows_batch "Unmap Network Drive" do
-      code "net use z: /d"
+    execute "Create Local Cache" do
+      command "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
     end
-    windows_batch "Creating print driver: #{new_resource.driver_name}" do
-      code "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{new_resource.inf_file}\""
+    execute "Unmap Network Drive" do
+      command "net use z: /d"
+    end
+    execute "Creating print driver: #{new_resource.driver_name}" do
+      command "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{ new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{new_resource.inf_file}\""
     end
 
     Chef::Log.info("#{ new_resource.driver_name } installed.")
     new_resource.updated_by_last_action(true)
     
-    windows_batch "Cleanup" do
-      code "rmdir \"C:\\chef\\cache\\#{new_resource.driver_name}\" /S /Q"
+    execute "Cleanup" do
+      command "rmdir \"C:\\chef\\cache\\#{new_resource.driver_name}\" /S /Q"
     end
   end
 end
 
 action :delete do
   if exists?
-    windows_batch "Deleting print driver: #{new_resource.driver_name}" do
-      code "rundll32 printui.dll PrintUIEntry /dd /m \"#{new_resource.driver_name}\" /h \"#{new_resource.environment}\" /v \"#{new_resource.version}\""
+    execute "Deleting print driver: #{new_resource.driver_name}" do
+      command "rundll32 printui.dll PrintUIEntry /dd /m \"#{new_resource.driver_name}\" /h \"#{new_resource.environment}\" /v \"#{new_resource.version}\""
     end
 
     new_resource.updated_by_last_action(true)
