@@ -27,9 +27,9 @@ printer_settings = data_bag('printer_settings')
 
 Chef::Log.error('Data bag cannot be empty') if printer_settings.empty?
 
-printer_settings.each do |settings|
+printer_settings.each do |printer|
 
-  printer_info = data_bag_item('printers', printer_settings)
+  printer_info = data_bag_item('printer_settings', printer)
   
   windows_print_printer_settings(printer) do
     action :restore
