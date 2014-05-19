@@ -83,6 +83,6 @@ action :delete do
 end
 
 def printer_exists?
-  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | fl name\"").run_command
-  check.stdout.include? new_resource.name
+  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.printer_name}'} | fl name\"").run_command
+  check.stdout.include? new_resource.printer_name
 end
