@@ -61,7 +61,7 @@ action :create do
       Chef::Log.info{"\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\"."}
     end
 
-    powershell_script "new_resource.printer_name" do
+    powershell_script "#{new_resource.printer_name}" do
       code cmd
     end
 
