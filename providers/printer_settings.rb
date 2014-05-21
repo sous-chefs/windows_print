@@ -24,34 +24,57 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+require 'mixlib/shellout'
 
 action :restore do
-  execute "Map Network Drive" do
-    command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
+  execute "Sanitize Network Drives" do
+    command "net use * /d /y"
   end
-  
-  execute "new_resource.printer_name" do
-    command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Sr /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8 r"
-  end
-  
-  execute "Unmap Network Drive" do
-    command "net use z: /d"
+
+  if printer_exists?
+    execute "Map Network Drive" do
+      command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
+    end
+
+    execute "#{new_resource.printer_name}" do
+      command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Sr /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8 r"
+    end
+
+    execute "Unmap Network Drive" do
+      command "net use z: /d"
+    end
+  else
+    Chef::Log.info("\"#{new_resource.printer_name}\" printer not found - unable to restore settings.")
   end
 end
 
 action :create do
-  execute "Map Network Drive" do
-    command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
+  execute "Sanitize Network Drives" do
+    command "net use * /d /y"
   end
+
+  if printer_exists?
+    execute "Map Network Drive" do
+      command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
+    end
+
+    execute "new_resource.printer_name" do
+      command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Ss /n \"#{new_resource.printer_name}\" /a \"c:\\chef\\cache\\#{new_resource.file}\" d u g 8"
+    end
   
-  execute "new_resource.printer_name" do
-    command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Ss /n \"#{new_resource.printer_name}\" /a \"c:\\chef\\cache\\#{new_resource.file}\" d u g 8"
+    execute "Upload file" do
+      command "move \"c:\\chef\\cache\\#{new_resource.file}\" \"z:\\\""
+    end
+
+    execute "Unmap Network Drive" do
+      command "net use z: /d"
+    end
+  else
+    Chef::Log.info("\"#{new_resource.printer_name}\" printer not found - unable to create settings.")
   end
-  execute "Upload file" do
-    command "move \"c:\\chef\\cache\\#{new_resource.file}\" \"z:\\\""
-  end
-  
-  execute "Unmap Network Drive" do
-    command "net use z: /d"
-  end
+end
+
+def printer_exists?
+  check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.printer_name}'} | fl name\"").run_command
+  check.stdout.include? new_resource.printer_name
 end
