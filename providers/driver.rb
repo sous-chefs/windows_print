@@ -52,6 +52,7 @@ action :install do
     
     execute "Cleanup" do
       command "rmdir \"C:\\chef\\cache\\#{new_resource.driver_name}\" /S /Q"
+      returns [0,1]
     end
   end
 end
