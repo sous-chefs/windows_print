@@ -1,9 +1,9 @@
 #
-# Author:: Doug Ireton (<doug.ireton@nordstrom.com>)
-# Cookbook Name:: windows
+# Author:: Derek Groh (<dgroh@arch.tamu.edu>)
+# Cookbook Name:: windows_print
 # Provider:: port
 #
-# Copyright:: 2012, Nordstrom, Inc.
+# Copyright:: 2014,  Texas A&M
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
