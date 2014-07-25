@@ -31,7 +31,7 @@ if node[:os_version] >= "6.2"
     { :name => "InstallationType", :type => :string, :data => "Server" },
     :machine
   )
-  features << "Printing-AdminTools-Collection"
+    features << "Printing-AdminTools-Collection"
   end
   features << "ServerManager-Core-RSAT"
   features << "ServerManager-Core-RSAT-Role-Tools"
