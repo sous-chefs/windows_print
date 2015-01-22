@@ -31,6 +31,18 @@ The windows_print::default recipe installs the required roles and features to su
 }
 ```
 
+#### windows_print::create_printer_settings_data_bag
+The windows_print::create_printer_settings_data_bag will create bin files containing the printer defaults.
+
+```json
+{
+  "name":"my_node",
+  "run_list": [
+    "recipe[windows_print::create_printer_settings_data_bag]"
+  ]
+}
+```
+
 #### windows_print::distributed_scan_server
 The windows_print::distributed_scan_server recipe installs the required role to support a windows distributed scan server.
 
@@ -63,6 +75,18 @@ The windows_print::lpd_service recipe installs the required role to install a li
   "name":"my_node",
   "run_list": [
     "recipe[windows_print::lpd_service]"
+  ]
+}
+```
+
+#### windows_print::printer_settings_data_bag
+The windows_print::printer_settings_data_bag will restore bin files containing the printer defaults.
+
+```json
+{
+  "name":"my_node",
+  "run_list": [
+    "recipe[windows_print::printer_settings_data_bag]"
   ]
 }
 ```

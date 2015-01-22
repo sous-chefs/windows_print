@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of print.
 
+## 0.9.0:
+
+* Changelog has been ignored for sometime.  Current features: Add, remove ports, printers, drivers.  Create and restore printer defaults.
+
 ## 0.1.0:
 
 * Initial release of print
