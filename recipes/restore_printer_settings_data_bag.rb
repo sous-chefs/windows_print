@@ -23,13 +23,13 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-printer_settings = data_bag('printer_settings')
+printer_settings = data_bag('printers')
 
 Chef::Log.error('Data bag cannot be empty') if printer_settings.empty?
 
-printer_settings.each do |printer|
+printers.each do |printer|
 
-  printer_info = data_bag_item('printer_settings', printer)
+  printer_info = data_bag_item('printers', printer)
   
   windows_print_printer_settings(printer) do
     action :restore
