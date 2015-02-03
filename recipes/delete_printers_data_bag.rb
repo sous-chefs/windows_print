@@ -25,9 +25,9 @@
 #
 printers = data_bag('printers_del')
 
-Chef::Log.error('Data bag cannot be empty') if printers_del.empty?
+Chef::Log.error('Data bag cannot be empty') if printers.empty?
 
-printers_del.each do |printer|
+printers.each do |printer|
 
   printer_info = data_bag_item('printers_del', printer)
 
@@ -44,5 +44,10 @@ printers_del.each do |printer|
     environment printer_info['environment']
     domain_username printer_info['domain_username']
     domain_password printer_info['domain_password']
+  end
+  
+  windows_print_port(printer) do
+    action [:delete]
+    ports printer_info['ports']
   end
 end

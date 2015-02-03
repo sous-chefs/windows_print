@@ -72,7 +72,7 @@ end
 
 action :delete do
   if printer_exists?
-    powershell_script "new_resource.printer_name" do
+    powershell_script "#{new_resource.printer_name}" do
       code "Remove-Printer -Name \"#{new_resource.printer_name}\""
     end
     new_resource.updated_by_last_action(true)

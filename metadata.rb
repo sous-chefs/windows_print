@@ -4,5 +4,5 @@ maintainer_email 'dgroh@arch.tamu.edu'
 license          'MIT'
 description      'Installs/Configures print'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          '0.9.0'
+version          '1.0.0'
 depends          'windows'

@@ -1,0 +1,16 @@
+{
+  "id": "HP-LaserJet-9050",
+  "printer_name": "HP-LaserJet-9050",
+  "share_name": "HP-LaserJet-Pro-400",
+  "inf_path": "\\\\fileserver\\Print Drivers\\HP Universal Printing PCL 6 (v5.4)\\x64",
+  "inf_file": "hpcu118u.inf",
+  "comment": "",
+  "location": "",
+  "driver_name": "HP Universal Printing PCL 6 (v5.4)",
+  "ports": { "HP-LaserJet-9050" : "192.168.1.100" },
+  "environment": "x64",
+  "domain_username": "admin",
+  "domain_password": "Password"
+  "path": "c:\\chef\\cache\\windows_print\\files\\printer_defaults",
+  "file": "HP-LaserJet-9050.bin",
+}
