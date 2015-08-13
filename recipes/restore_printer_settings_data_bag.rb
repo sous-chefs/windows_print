@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: windows_print
-# Recipe:: printer_data_bag
+# Recipe:: printer_setting_data_bag
 #
 # Copyright 2013, Texas A&M
 #
@@ -30,18 +30,12 @@ Chef::Log.error('Data bag cannot be empty') if printers.empty?
 printers.each do |printer|
 
   printer_info = data_bag_item('printers', printer)
-
-  windows_print_printer(printer) do
-    action [:create]
+  
+  windows_print_printer_settings(printer) do
+    action :restore
     printer_name printer_info['printer_name']
-    share_name printer_info['share_name']
-    inf_path printer_info['inf_path']
-    inf_file printer_info['inf_file']
-    comment printer_info['comment']
-    location printer_info['location']
-    driver_name printer_info['driver_name']
-    ports printer_info['ports']
-    environment printer_info['environment']
+    path printer_info['path']
+    file printer_info['file']
     domain_username printer_info['domain_username']
     domain_password printer_info['domain_password']
   end

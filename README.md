@@ -32,13 +32,37 @@ The windows_print::default recipe installs the required roles and features to su
 ```
 
 #### windows_print::create_printer_settings_data_bag
-The windows_print::create_printer_settings_data_bag will create bin files containing the printer defaults.
+The windows_print::create_printer_settings_data_bag will create bin files containing the current printer defaults.  These must be manually changed through Print Management.  Assumes printer data bag item is labelled "printers".  See files section for sample data bag example.
 
 ```json
 {
   "name":"my_node",
   "run_list": [
-    "recipe[windows_print::create_printer_settings_data_bag]"
+    "recipe[windows_print::create_printers_settings_data_bag]"
+  ]
+}
+```
+
+#### windows_print::create_printers_data_bag
+The windows_print::create_printers_data_bag will install the driver, create the port, and printer for each data bag item.  Assumes printer data bag item is labelled "printers".  See files section for sample data bag example.  
+
+```json
+{
+  "name":"my_node",
+  "run_list": [
+    "recipe[windows_print::create_printers_data_bag]"
+  ]
+}
+```
+
+#### windows_print::delete_printers_data_bag
+The windows_print::delete_printers_data_bag will remove the port and printer for each data bag item.  The driver is not touched as there is no current method to detect if the driver is still in use.  Assumes printer data bag item is labelled "printers_del".  See files section for sample data bag example.  
+
+```json
+{
+  "name":"my_node",
+  "run_list": [
+    "recipe[windows_print::delete_printers_data_bag]"
   ]
 }
 ```
@@ -79,8 +103,8 @@ The windows_print::lpd_service recipe installs the required role to install a li
 }
 ```
 
-#### windows_print::printer_settings_data_bag
-The windows_print::printer_settings_data_bag will restore bin files containing the printer defaults.
+#### windows_print::restore_printer_settings_data_bag
+The windows_print::restore_printer_settings_data_bag will restore bin files containing the printer defaults.
 
 ```json
 {
@@ -88,6 +112,36 @@ The windows_print::printer_settings_data_bag will restore bin files containing t
   "run_list": [
     "recipe[windows_print::printer_settings_data_bag]"
   ]
+}
+```
+
+Files
+=================
+
+'printer_defaults'
+------------------
+Example binary file created from create_printer_settings_data_bag and used to restore settings using restore_printer_settings_data_bag.
+
+'printers/printers_del'
+-----------------------
+Example data bag for using data bags to manage printer objects. Use with create_printer_settings_data_bag, create_printers_data_bag, delete_printers_data_bag, and restore_printer_settings_data_bag.
+
+```json
+{
+  "id": "HP-LaserJet-9050",
+  "printer_name": "HP-LaserJet-9050",
+  "share_name": "HP-LaserJet-9050",
+  "inf_path": "\\\\fileserver\\Print Drivers\\HP Universal Printing PCL 6 (v5.4)\\x64",
+  "inf_file": "hpcu118u.inf",
+  "comment": "",
+  "location": "",
+  "driver_name": "HP Universal Printing PCL 6 (v5.4)",
+  "ports": { "HP-LaserJet-9050" : "192.168.1.100" },
+  "environment": "x64",
+  "domain_username": "admin",
+  "domain_password": "Password"
+  "path": "c:\\chef\\cache\\windows_print\\files\\printer_defaults",
+  "file": "HP-LaserJet-9050.bin",
 }
 ```
 
@@ -208,7 +262,7 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
 
 'printer_settings'
 ------------------
-Creates and restores all printer settings (Printing Defaults)
+Creates and restores printer settings (Printing Defaults) from binary file.
 
 ### Actions
 - :create: Creates a bin file to store settings.
@@ -232,7 +286,7 @@ Creates and restores all printer settings (Printing Defaults)
       domain_password "<Password>"
     end
 
-    # Retore settings file for "HP LaserJet"
+    # Restore settings file for "HP LaserJet"
     windows_print_printer_settings "HP Laserjet" do
       path "\\\\<server>\\<share>"
       file "HP LaserJet.bin"
@@ -252,6 +306,7 @@ Allows creation of ports based on name rather than IP Address.
 ### Attribute Parameters
 - port_name: name attribute.  Name of the port.
 - ipv4_address: IPv4 address of the printer port
+- ports: Name of the port and IPv4 address. 
 
 ### Examples
 

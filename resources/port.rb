@@ -30,3 +30,4 @@ default_action :create
 
 attribute :port_name, :name_attribute => true, :kind_of => String, :required => true 
 attribute :ipv4_address, :kind_of => String, :regex => Resolv::IPv4::Regex
+attribute :ports, :kind_of => Hash

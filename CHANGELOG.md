@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of print.
 
+## 1.0.0:
+
+* Support for data bag items with recipes to create and delete printer objects and printer settings.
+
 ## 0.9.0:
 
 * Changelog has been ignored for sometime.  Current features: Add, remove ports, printers, drivers.  Create and restore printer defaults.
