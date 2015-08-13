@@ -29,18 +29,22 @@ require 'mixlib/shellout'
 action :restore do
   execute "Sanitize Network Drives" do
     command "net use * /d /y"
+	new_resource.updated_by_last_action(true)
   end
 
   if printer_exists?
     execute "Map Network Drive" do
       command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
     end
-
-    execute "#{new_resource.printer_name}" do
-      command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Sr /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8 r"
-    end
-
-    execute "Unmap Network Drive" do
+	  if file_exists?
+	    Chef::Log.info("\"#{new_resource.file}\" does not exist - skipping.")
+	  else
+        execute '#{new_resource.printer_name}' do
+          #not_if { File.exists?("#{new_resource.path}\\#{new_resource.file}") }
+		  command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Sr /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8 r"
+		end
+      end
+	execute "Unmap Network Drive" do
       command "net use z: /d"
     end
   else
@@ -51,6 +55,7 @@ end
 action :create do
   execute "Sanitize Network Drives" do
     command "net use * /d /y"
+	new_resource.updated_by_last_action(true)
   end
 
   if printer_exists?
@@ -77,4 +82,10 @@ end
 def printer_exists?
   check = Mixlib::ShellOut.new("powershell.exe \"Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.printer_name}'} | fl name\"").run_command
   check.stdout.include? new_resource.printer_name
+end
+
+def file_exists?
+   powershell_script "check file" do
+     code "Test-Path \"#{new_resource.path}\\#{new_resource.file}\""
+   end
 end
