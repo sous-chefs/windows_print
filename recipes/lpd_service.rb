@@ -23,7 +23,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-if node[:os_version] >= "6.2" 
+if node['os_version'] >= "6.2" 
   [
     "Printing-Server-Foundation-Features",
     "Printing-Server-Role",

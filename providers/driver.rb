@@ -102,5 +102,4 @@ def driver_name
   else
     Chef::Log.info("Please use \"x64\", \"x86\" or \"Itanium\" as the environment type")
   end
-  
 end

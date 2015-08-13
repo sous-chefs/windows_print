@@ -24,7 +24,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-if node[:os_version] >= "6.2" 
+if node['os_version'] >= "6.2" 
   features = ["Printing-Server-Foundation-Features", "Printing-Server-Role",]
   if registry_data_exists?(
     "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion",
