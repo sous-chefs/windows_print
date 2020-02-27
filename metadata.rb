@@ -6,3 +6,7 @@ description      'Installs/Configures print'
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.0.2'
 depends          'windows'
+issues_url       'https://github.com/TAMUArch/cookbook.windows_print/issues'
+source_url       'https://github.com/TAMUArch/cookbook.windows_print'
+supports         'windows'
+chef_version     '> 14'
