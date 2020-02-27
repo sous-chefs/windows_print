@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: windows_print
-# Recipe:: create_printer_setting_data_bag
+# Recipe:: printer_setting_data_bag
 #
-# Copyright 2015, Texas A&M
+# Copyright 2013, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,14 +25,13 @@
 #
 printers = data_bag('printers')
 
-Chef::Log.error('Data bag cannot be empty') if printer.empty?
+Chef::Log.error('Data bag cannot be empty') if printers.empty?
 
 printers.each do |printer|
-
   printer_info = data_bag_item('printers', printer)
-  
+
   windows_print_printer_settings(printer) do
-    action :create
+    action :restore
     printer_name printer_info['printer_name']
     path printer_info['path']
     file printer_info['file']

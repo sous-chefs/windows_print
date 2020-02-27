@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: windows_print
-# Recipe:: remove_printer_data_bag
+# Recipe:: printer_data_bag
 #
 # Copyright 2013, Texas A&M
 #
@@ -23,16 +23,15 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-printers = data_bag('printers_del')
+printers = data_bag('printers')
 
 Chef::Log.error('Data bag cannot be empty') if printers.empty?
 
 printers.each do |printer|
-
-  printer_info = data_bag_item('printers_del', printer)
+  printer_info = data_bag_item('printers', printer)
 
   windows_print_printer(printer) do
-    action [:delete]
+    action [:create]
     printer_name printer_info['printer_name']
     share_name printer_info['share_name']
     inf_path printer_info['inf_path']
@@ -44,10 +43,5 @@ printers.each do |printer|
     environment printer_info['environment']
     domain_username printer_info['domain_username']
     domain_password printer_info['domain_password']
-  end
-  
-  windows_print_port(printer) do
-    action [:delete]
-    ports printer_info['ports']
   end
 end
