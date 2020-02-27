@@ -23,22 +23,9 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-if node['os_version'] >= "6.2" 
-  [
-    "Printing-Server-Foundation-Features",
-    "FSRM-Infrastructure-Services",
-    "BusScan-ScanServer"
-  ].each do |feature|
-    windows_feature feature do
-      action :install
-    end
-  end
-else
-  [
-    "BusScan-ScanServer"
-  ].each do |feature|
-    windows_feature feature do
-      action :install
-    end
-  end
+
+windows_feature %w(Printing-Server-Foundation-Features
+                   FSRM-Infrastructure-Services
+                   BusScan-ScanServer) do
+  action :install
 end
