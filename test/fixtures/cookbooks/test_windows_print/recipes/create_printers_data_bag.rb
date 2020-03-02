@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: windows_print
+# Cookbook:: windows_print
 # Recipe:: printer_data_bag
 #
-# Copyright 2013, Texas A&M
+# Copyright:: 2013, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the

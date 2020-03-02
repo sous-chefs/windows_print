@@ -3,7 +3,6 @@ maintainer       'Texas A&M'
 maintainer_email 'derekgroh@github.com'
 license          'MIT'
 description      'Installs/Configures print'
-long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version          '1.0.2'
 issues_url       'https://github.com/TAMUArch/cookbook.windows_print/issues'
 source_url       'https://github.com/TAMUArch/cookbook.windows_print'
