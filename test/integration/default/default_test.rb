@@ -11,6 +11,7 @@ describe windows_feature('Printing-Server-Role', :dism) do
   it { should be_installed }
 end
 
+# Test will fail on Server Core
 describe windows_feature('Printing-AdminTools-Collection', :dism) do
   it { should be_installed }
 end
