@@ -24,19 +24,19 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-features = ['Printing-Server-Foundation-Features', 'Printing-Server-Role']
-# Install additional role if Full Server Install (not ServerCore)
-if registry_data_exists?(
-  'HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion',
-  { name: 'InstallationType', type: :string, data: 'Server' },
-  :machine
-)
-  features << 'Printing-AdminTools-Collection'
+windows_feature %w(Printing-Server-Foundation-Features
+                   Printing-Server-Role
+                   ServerManager-Core-RSAT
+                   ServerManager-Core-RSAT-Role-Tools) do
+  action :install
 end
-features << 'ServerManager-Core-RSAT'
-features << 'ServerManager-Core-RSAT-Role-Tools'
-features.each do |feature|
-  windows_feature feature do
-    action :install
+
+# Feature not available on Server Core
+windows_feature 'Printing-AdminTools-Collection' do
+  action :install
+  only_if do
+    registry_data_exists?(
+      'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion',
+      name: 'InstallationType', type: :string, data: 'Server')
   end
 end
