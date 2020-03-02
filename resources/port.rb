@@ -1,9 +1,9 @@
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
-# Cookbook Name:: windows_print
+# Cookbook:: windows_print
 # resource:: port
 #
-# Copyright 2013, Texas A&M
+# Copyright:: 2013, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
