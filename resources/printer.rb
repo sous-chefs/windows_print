@@ -40,8 +40,6 @@ property :inf_file, String
 property :domain_username, String
 property :domain_password, String
 
-require 'mixlib/shellout'
-
 action :create do
   converge_by("Creating Printer Port #{new_resource.port_name}, #{new_resource.ipv4_address}") do
     new_resource.ports.each do |port_name, ipv4_address|

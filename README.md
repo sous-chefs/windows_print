@@ -84,9 +84,9 @@ Installs printer driver from inf file.
 * :install: Installs a printer driver
 * :delete: Removes a printer driver
 
-#### Attribute Parameters
+#### Property Parameters
 
-* driver_name: name attribute.  Name of the print driver.
+* driver_name: name property.  Name of the print driver.
 * inf_path: Full path to the inf file.
 * inf_file: Name of the inf file.
 * version: Default "Type 3 - User Mode" Options: "Type 3 - User Mode" or "Type 2 - Kernel Mode"
@@ -128,9 +128,9 @@ Allows creation of printer objects.  Handles port and driver creation if not pre
 * :create: Creates a printer
 * :delete: Deletes a printer
 
-#### Attribute Parameters
+#### Property Parameters
 
-* printer_name: name attribute.  Name of the printer. Required
+* printer_name: name property.  Name of the printer. Required
 * driver_name: Name of the print driver. Required
 * ports: Name of the port and IPv4 address. Required
 * share_name: Shared printer object name.
@@ -204,7 +204,7 @@ Creates and restores printer settings (Printing Defaults) from binary file.
 * :create: Creates a bin file to store settings.
 * :restore: Uses previously created bin file to restore settings.
 
-#### Attribute Parameters
+#### Property Parameters
 
 * printer_name: Name of the printer.
 * path: Full path to settings file.
@@ -243,9 +243,9 @@ Allows creation of ports based on name rather than IP Address.
 * :create: Installs a printer port
 * :delete: Removes a printer port
 
-#### Attribute Parameters
+#### Property Parameters
 
-* port_name: name attribute.  Name of the port.
+* port_name: name property.  Name of the port.
 * ipv4_address: IPv4 address of the printer port
 * ports: Name of the port and IPv4 address. 
 

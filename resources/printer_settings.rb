@@ -31,8 +31,6 @@ property :file, String, required: true
 property :domain_username, String
 property :domain_password, String
 
-require 'mixlib/shellout'
-
 action :restore do
   converge_by "Restore printer settings for #{new_resource.printer_name}" do
     execute 'Sanitize Network Drives' do
@@ -95,8 +93,6 @@ action_class do
   end
 
   def file_exists?
-    powershell_script 'check file' do
-      code "Test-Path \"#{new_resource.path}\\#{new_resource.file}\""
-    end
+    ::File.exists?("#{new_resource.path}\\#{new_resource.file}")
   end
 end

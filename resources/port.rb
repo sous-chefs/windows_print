@@ -29,8 +29,6 @@ property :port_name, String, name_property: true
 property :ipv4_address, String, regex: Resolv::IPv4::Regex
 property :ports, Hash
 
-require 'mixlib/shellout'
-
 action :create do
   if port_exists?
     Chef::Log.debug("#{new_resource.port_name} already created - nothing to do.")
