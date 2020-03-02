@@ -93,6 +93,6 @@ action_class do
   end
 
   def file_exists?
-    ::File.exists?("#{new_resource.path}\\#{new_resource.file}")
+    ::File.exist?("#{new_resource.path}\\#{new_resource.file}")
   end
 end
