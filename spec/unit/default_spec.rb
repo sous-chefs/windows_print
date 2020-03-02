@@ -23,9 +23,9 @@ RSpec.shared_examples 'windows_print' do |platform, version|
   end
 end
 
-RSpec.describe 'cloud_apps::default' do
+RSpec.describe 'windows_print::default' do
   platforms = {
-    'windows' => %w(2012r2 2019),
+    'windows' => %w(2012R2 2019),
   }
 
   platforms.each do |platform, versions|
