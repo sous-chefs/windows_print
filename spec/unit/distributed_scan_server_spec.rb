@@ -1,6 +1,6 @@
 #
 # Cookbook:: windows_print
-# Spec:: default
+# Spec:: distributed_scan_server
 #
 # Copyright:: 2020, The Authors, All Rights Reserved.
 
@@ -13,15 +13,14 @@ RSpec.shared_examples 'windows_print' do |platform, version|
         os: 'windows',
         platform: platform,
         version: version,
-        step_into: ['windows_print::default']
+        step_into: ['windows_print::distributed_scan_server']
       ).converge(described_recipe)
     end
 
     it 'installs windows features' do
       expect(chef_run).to install_windows_feature('Printing-Server-Foundation-Features')
-      expect(chef_run).to install_windows_feature('Printing-Server-Role')
-      expect(chef_run).to install_windows_feature('ServerManager-Core-RSAT')
-      expect(chef_run).to install_windows_feature('ServerManager-Core-RSAT-Role-Tools')
+      expect(chef_run).to install_windows_feature('FSRM-Infrastructure-Services')
+      expect(chef_run).to install_windows_feature('BusScan-ScanServer')
     end
 
     it 'converges successfully' do
@@ -30,7 +29,7 @@ RSpec.shared_examples 'windows_print' do |platform, version|
   end
 end
 
-RSpec.describe 'windows_print::default' do
+RSpec.describe 'windows_print::distributed_scan_server' do
   platforms = {
     'windows' => %w(2012R2 2019),
   }

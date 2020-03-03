@@ -1,6 +1,6 @@
 #
 # Cookbook:: windows_print
-# Spec:: default
+# Spec:: lpd_service
 #
 # Copyright:: 2020, The Authors, All Rights Reserved.
 
@@ -13,15 +13,14 @@ RSpec.shared_examples 'windows_print' do |platform, version|
         os: 'windows',
         platform: platform,
         version: version,
-        step_into: ['windows_print::default']
+        step_into: ['windows_print::lpd_service']
       ).converge(described_recipe)
     end
 
     it 'installs windows features' do
       expect(chef_run).to install_windows_feature('Printing-Server-Foundation-Features')
       expect(chef_run).to install_windows_feature('Printing-Server-Role')
-      expect(chef_run).to install_windows_feature('ServerManager-Core-RSAT')
-      expect(chef_run).to install_windows_feature('ServerManager-Core-RSAT-Role-Tools')
+      expect(chef_run).to install_windows_feature('Printing-LPDPrintService')
     end
 
     it 'converges successfully' do
@@ -30,7 +29,7 @@ RSpec.shared_examples 'windows_print' do |platform, version|
   end
 end
 
-RSpec.describe 'windows_print::default' do
+RSpec.describe 'windows_print::lpd_service' do
   platforms = {
     'windows' => %w(2012R2 2019),
   }
