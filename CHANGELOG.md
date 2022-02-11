@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of print.
 
+## Unreleased
+
+* Transfer ownership to sous-chefs
+
 ## 2.0.0:
 
 * Providers removed in favor of resources
