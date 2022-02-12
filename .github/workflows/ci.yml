@@ -35,7 +35,7 @@ jobs:
         uses: actionshub/markdownlint@main
 
   integration-windows-2016:
-    needs: [mdl, yamllint, delivery]
+    needs: [mdl, yamllint]
     runs-on: windows-2016
     strategy:
       matrix:

@@ -1,4 +1,5 @@
 # windows_print Cookbook
+
 This cookbook installs Windows Print and Document Services, handles driver, port, and printer installation.
 
 ## Requirements
@@ -34,6 +35,8 @@ The `windows_print::distributed_scan_server` recipe installs the required roles 
 
 Provides the service which receives scanned documents from network scanners and routes them to the correct destinations. It also includes the Scan Management snap-in, which you can use to manage network scanners and configure scan processes.
 
+This feature is only available for server 2012r2 and server 2016.
+
 ```json
 {
   "name":"my_node",
@@ -49,6 +52,8 @@ The `windows_print::internet_printing` recipe installs the required roles and fe
 
 Creates a Web site where users can manage print jobs on the server. It also enables users who have Internet Printing Client installed to use a Web browser to connect and print to shared printers on the server by using the Internet Printing Protocol (IPP).
 
+This feature is only available for server 2012r2 and server 2016.
+
 ```json
 {
   "name":"my_node",
@@ -63,6 +68,8 @@ Creates a Web site where users can manage print jobs on the server. It also enab
 The `windows_print::lpd_service` recipe installs the required roles and features to install LPD Service.
 
 Line Printer Daemon (LPD) Service enables UNIX-based computers or other computers using the Line Printer Remote (LPR) service to print to shared printers on this server.
+
+This feature is only available for server 2012r2 and server 2016.
 
 ```json
 {
@@ -247,7 +254,7 @@ Allows creation of ports based on name rather than IP Address.
 
 * port_name: name property.  Name of the port.
 * ipv4_address: IPv4 address of the printer port
-* ports: Name of the port and IPv4 address. 
+* ports: Name of the port and IPv4 address.
 
 #### Examples
 
@@ -294,7 +301,7 @@ The `test_windows_print::create_printers_data_bag` will install the driver, crea
 
 ### windows_print::delete_printers_data_bag
 
-The `test_windows_print::delete_printers_data_bag` will remove the port and printer for each data bag item.  The driver is not touched as there is no current method to detect if the driver is still in use.  Assumes printer data bag item is labelled `printers_del`.  See `.\test\fixtures\data_bags` for sample data bag example. 
+The `test_windows_print::delete_printers_data_bag` will remove the port and printer for each data bag item.  The driver is not touched as there is no current method to detect if the driver is still in use.  Assumes printer data bag item is labelled `printers_del`.  See `.\test\fixtures\data_bags` for sample data bag example.
 
 ```json
 {
@@ -350,11 +357,11 @@ Example data bag for using `data_bags` to manage printer objects. `inf_file` wil
 ## Contributing
 
 1. Fork the repository on Github
-2. Create a named feature branch (like `add_component_x`)
-3. Write you change
-4. Write tests for your change (if applicable)
-5. Run the tests, ensuring they all pass
-6. Submit a Pull Request using Github
+1. Create a named feature branch (like `add_component_x`)
+1. Write you change
+1. Write tests for your change (if applicable)
+1. Run the tests, ensuring they all pass
+1. Submit a Pull Request using Github
 
 ## License and Authors
 
