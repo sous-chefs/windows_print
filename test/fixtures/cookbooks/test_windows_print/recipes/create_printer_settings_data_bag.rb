@@ -1,8 +1,8 @@
 #
 # Cookbook:: windows_print
-# Recipe:: lpd_service
+# Recipe:: create_printer_setting_data_bag
 #
-# Copyright:: 2013, Texas A&M
+# Copyright:: 2015, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,9 +23,19 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+printers = data_bag('printers')
 
-windows_feature %w(Printing-Server-Foundation-Features
-                   Printing-Server-Role
-                   Printing-LPDPrintService) do
-  action :install
+Chef::Log.error('Data bag cannot be empty') if printer.empty?
+
+printers.each do |printer|
+  printer_info = data_bag_item('printers', printer)
+
+  windows_print_printer_settings(printer) do
+    action :create
+    printer_name printer_info['printer_name']
+    path printer_info['path']
+    file printer_info['file']
+    domain_username printer_info['domain_username']
+    domain_password printer_info['domain_password']
+  end
 end

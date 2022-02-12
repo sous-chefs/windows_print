@@ -1,5 +1,7 @@
-cookbook 'windows_print'
+source 'https://supermarket.chef.io'
+
+metadata
 
 group :integration do
-  cookbook "windows_print", :path => "."
+  cookbook 'test_windows_print', path: 'test/fixtures/cookbooks/test_windows_print'
 end

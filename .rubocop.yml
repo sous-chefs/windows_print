@@ -1,0 +1,12 @@
+ChefCorrectness/ResourceSetsNameProperty:
+  Exclude:
+    - 'test/fixtures/test_cookbooks/test_windows_dhcp/recipes/data_bag.rb'
+
+Lint/ParenthesesAsGroupedExpression:
+  Exclude:
+    - 'test/fixtures/test_cookbooks/test_windows_ad/recipes/ad_objects.rb'
+    - 'test/fixtures/test_cookbooks/test_windows_ad/recipes/setup_dc.rb'
+
+Style/ClassVars:
+  Exclude:
+    - 'test/fixtures/test_cookbooks/test_windows_ad/libraries/windows_helper.rb'

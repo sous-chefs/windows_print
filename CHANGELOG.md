@@ -2,6 +2,22 @@
 
 This file is used to list changes made in each version of print.
 
+## Unreleased
+
+* Transfer ownership to sous-chefs
+
+## 2.0.0:
+
+* Providers removed in favor of resources
+* Restructured cookbook - move sample files into test.
+* Test kitchen support
+* Delivery support
+* Github Issues
+
+## 1.0.2:
+
+* Skip restore settings if the file does not exist
+
 ## 1.0.0:
 
 * Support for data bag items with recipes to create and delete printer objects and printer settings.
@@ -12,7 +28,7 @@ This file is used to list changes made in each version of print.
 
 ## 0.1.0:
 
-* Initial release of print
+* Initial release of windows_print
 
 - - -
 Check the [Markdown Syntax Guide](http://daringfireball.net/projects/markdown/syntax) for help with Markdown.
