@@ -11,6 +11,7 @@ jobs:
       - uses: actions/stale@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # yamllint disable rule:line-length
           close-issue-message: >
             Closing due to inactivity.
             If this is still an issue please reopen or open another issue.
@@ -23,3 +24,4 @@ jobs:
             Remove stale label or comment or this will be closed in 7 days.
             Alternatively drop by the #sous-chefs channel on the [Chef Community Slack](http://community-slack.chef.io/) and we'll be happy to help!
             Thanks, Sous-Chefs.
+          # yamllint enable rule:line-length

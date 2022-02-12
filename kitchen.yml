@@ -31,7 +31,7 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[windows_print::default]      
+      - recipe[windows_print::default]
     verifier:
       inspec_tests:
         - test/integration/default
@@ -49,7 +49,7 @@ suites:
     verifier:
       inspec_tests:
         - test/integration/internet_printing
-  
+
   - name: lpd-service
     run_list:
       - recipe[windows_print::lpd_service]
