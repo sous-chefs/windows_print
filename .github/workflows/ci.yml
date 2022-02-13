@@ -42,7 +42,10 @@ jobs:
         os:
           - 'windows-2016'
         suite:
-          - 'all'
+          - 'default'
+          - 'distributed-scan'
+          - 'internet-printing'
+          - 'lpd-service'
       fail-fast: false
 
     steps:
@@ -62,14 +65,17 @@ jobs:
           os: ${{ matrix.os }}
 
   integration:
-    needs: [mdl, yamllint, delivery]
+    needs: [mdl, yamllint]
     runs-on: windows-latest
     strategy:
       matrix:
         os:
           - 'windows-2019'
         suite:
-          - 'all'
+          - 'default'
+          - 'distributed-scan'
+          - 'internet-printing'
+          - 'lpd-service'
       fail-fast: false
 
     steps:
