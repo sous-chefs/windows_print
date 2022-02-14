@@ -25,6 +25,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
+unified_mode true
+
 property :printer_name, String, name_property: true
 property :driver_name, String, required: true
 property :ports, Hash, required: true

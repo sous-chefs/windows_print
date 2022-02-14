@@ -1,5 +1,5 @@
 ---
-ChefCorrectness/ResourceSetsNameProperty:
+Chef/Correctness/ResourceSetsNameProperty:
   Exclude:
     - 'test/fixtures/test_cookbooks/test_windows_dhcp/recipes/data_bag.rb'
 
