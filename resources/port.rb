@@ -25,6 +25,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
+unified_mode true
+
 property :port_name, String, name_property: true
 property :ipv4_address, String, regex: Resolv::IPv4::Regex
 property :ports, Hash

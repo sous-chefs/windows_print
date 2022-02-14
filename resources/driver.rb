@@ -5,6 +5,8 @@
 # Copyright:: 2013, Texas A&M
 #
 
+unified_mode true
+
 property :driver_name, String, name_property: true
 property :inf_path, String, required: true
 property :inf_file, String, required: true
