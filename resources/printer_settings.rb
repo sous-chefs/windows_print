@@ -43,24 +43,14 @@ property :domain_password, String
 
 action :restore do
   converge_by "Restore printer settings for #{new_resource.printer_name}" do
-    execute 'Sanitize Network Drives' do
-      command 'net use * /d /y'
-    end
-
     if printer_exists?
-      execute 'Map Network Drive' do
-        command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
-      end
       if file_exists?
         Chef::Log.debug("\"#{new_resource.file}\" does not exist - skipping.")
       else
         execute new_resource.printer_name do
-          # not_if { File.exists?("#{new_resource.path}\\#{new_resource.file}") }
           command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Sr /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8 r"
+          not_if { ::File.exist?("#{new_resource.path}\\#{new_resource.file}") }
         end
-      end
-      execute 'Unmap Network Drive' do
-        command 'net use z: /d'
       end
     else
       Chef::Log.debug("\"#{new_resource.printer_name}\" printer not found - unable to restore settings.")
@@ -70,25 +60,9 @@ end
 
 action :create do
   converge_by "Create printer settings for #{new_resource.printer_name}" do
-    execute 'Sanitize Network Drives' do
-      command 'net use * /d /y'
-    end
-
     if printer_exists?
-      execute 'Map Network Drive' do
-        command "net use z: \"#{new_resource.path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
-      end
-
       execute "Create #{new_resource.printer_name}.bin" do
-        command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Ss /n \"#{new_resource.printer_name}\" /a \"c:\\chef\\cache\\#{new_resource.file}\" d u g 8"
-      end
-
-      execute 'Upload file' do
-        command "move \"c:\\chef\\cache\\#{new_resource.file}\" \"z:\\\""
-      end
-
-      execute 'Unmap Network Drive' do
-        command 'net use z: /d'
+        command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Ss /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8"
       end
     else
       Chef::Log.debug("\"#{new_resource.printer_name}\" printer not found - unable to create settings.")

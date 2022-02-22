@@ -25,7 +25,7 @@
 #
 printers = data_bag('printers')
 
-Chef::Log.error('Data bag cannot be empty') if printer.empty?
+Chef::Log.error('Data bag cannot be empty') if printers.empty?
 
 printers.each do |printer|
   printer_info = data_bag_item('printers', printer)

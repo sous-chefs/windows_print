@@ -23,6 +23,19 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+
+directory 'c:\\chef\\cache'
+
+remote_file 'c:\\chef\\cache\\upd-pcl6-x64-7.0.1.24923.zip' do
+  source 'https://ftp.ext.hp.com/pub/softlib/software13/COL40842/ds-99374-24/upd-pcl6-x64-7.0.1.24923.exe'
+  action :create
+end
+
+archive_file 'upd-pcl6-x64-7.0.1.24923.zip' do
+  path 'c:\\chef\\cache\\upd-pcl6-x64-7.0.1.24923.zip'
+  destination 'c:\\HP Universal Print Driver'
+end
+
 printers = data_bag('printers')
 
 Chef::Log.error('Data bag cannot be empty') if printers.empty?

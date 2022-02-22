@@ -35,7 +35,7 @@ The `windows_print::distributed_scan_server` recipe installs the required roles 
 
 Provides the service which receives scanned documents from network scanners and routes them to the correct destinations. It also includes the Scan Management snap-in, which you can use to manage network scanners and configure scan processes.
 
-This feature is only available for server 2012r2 and server 2016.
+This feature is only available for server 2012r2 and server 2016 and domain membership is required.
 
 ```json
 {
@@ -52,8 +52,6 @@ The `windows_print::internet_printing` recipe installs the required roles and fe
 
 Creates a Web site where users can manage print jobs on the server. It also enables users who have Internet Printing Client installed to use a Web browser to connect and print to shared printers on the server by using the Internet Printing Protocol (IPP).
 
-This feature is only available for server 2012r2 and server 2016.
-
 ```json
 {
   "name":"my_node",
@@ -68,8 +66,6 @@ This feature is only available for server 2012r2 and server 2016.
 The `windows_print::lpd_service` recipe installs the required roles and features to install LPD Service.
 
 Line Printer Daemon (LPD) Service enables UNIX-based computers or other computers using the Line Printer Remote (LPR) service to print to shared printers on this server.
-
-This feature is only available for server 2012r2 and server 2016.
 
 ```json
 {

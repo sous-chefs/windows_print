@@ -30,6 +30,8 @@ unified_mode true
 property :printer_name, String, name_property: true
 property :driver_name, String, required: true
 property :ports, Hash, required: true
+property :port_name, String
+property :ipv4_address, String
 property :share_name, String
 property :location, String
 property :comment, String
@@ -43,7 +45,7 @@ property :domain_username, String
 property :domain_password, String
 
 action :create do
-  converge_by("Creating Printer Port #{new_resource.port_name}, #{new_resource.ipv4_address}") do
+  converge_by("Creating Printer Port #{new_resource.port_name}, #{new_resource.ipv4_address}") do  # Does not report correctly
     new_resource.ports.each do |port_name, ipv4_address|
       windows_print_port port_name do
         ipv4_address ipv4_address
@@ -55,8 +57,8 @@ action :create do
     windows_print_driver new_resource.driver_name do
       inf_path new_resource.inf_path
       inf_file new_resource.inf_file
-      domain_username new_resource.domain_username
-      domain_password new_resource.domain_password
+      domain_username new_resource.domain_username if new_resource.domain_password
+      domain_password new_resource.domain_password if new_resource.domain_password
     end
   end
 
