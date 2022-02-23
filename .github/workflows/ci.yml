@@ -4,7 +4,7 @@ name: ci
 "on":
   pull_request:
   push:
-    branches: [sous-chefs]
+    branches: [main]
 
 jobs:
   lint-unit:
@@ -21,6 +21,7 @@ jobs:
           - 'default'
           - 'internet-printing'
           - 'lpd-service'
+          - 'resources'
       fail-fast: false
 
     steps:
