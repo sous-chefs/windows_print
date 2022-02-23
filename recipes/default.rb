@@ -37,6 +37,7 @@ windows_feature 'Printing-AdminTools-Collection' do
   only_if do
     registry_data_exists?(
       'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion',
-      name: 'InstallationType', type: :string, data: 'Server')
+      name: 'InstallationType', type: :string, data: 'Server'
+    )
   end
 end

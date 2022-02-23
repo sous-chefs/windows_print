@@ -28,4 +28,5 @@ windows_feature %w(Printing-Server-Foundation-Features
                    Printing-Server-Role
                    Printing-LPDPrintService) do
   action :install
+  management_tools true
 end

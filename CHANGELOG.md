@@ -5,6 +5,7 @@ This file is used to list changes made in each version of print.
 ## Unreleased
 
 * Transfer ownership to sous-chefs
+* Remove Map Network drive for driver and printer resources.
 
 ## 2.0.0
 

@@ -38,10 +38,13 @@ suites:
 
   - name: distributed-scan
     run_list:
+      - recipe[test_windows_ad::setup_forest]
       - recipe[windows_print::distributed_scan_server]
     verifier:
       inspec_tests:
         - test/integration/distributed_scan_server
+    excludes:
+      - tas50/windows_2019
 
   - name: internet-printing
     run_list:
@@ -56,3 +59,14 @@ suites:
     verifier:
       inspec_tests:
         - test/integration/lpd_service
+
+  - name: resources
+    data_bags_path: "test/fixtures/data_bags"
+    run_list:
+      - recipe[windows_print::default]
+      - recipe[test_windows_print::create_printers_data_bag]
+      - recipe[test_windows_print::create_printer_settings_data_bag]
+      - recipe[test_windows_print::restore_printer_settings_data_bag]
+    verifier:
+      inspec_tests:
+        - test/integration/resources

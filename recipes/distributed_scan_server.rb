@@ -24,8 +24,14 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 
-windows_feature %w(Printing-Server-Foundation-Features
-                   FSRM-Infrastructure-Services
-                   BusScan-ScanServer) do
-  action :install
+# Not available in server 2019.
+# Requires system to be a domain member
+if Chef::Version.new(node['os_version']) < Chef::Version.new('10.0.17')
+  windows_feature %w(Printing-Server-Foundation-Features
+                     FSRM-Infrastructure-Services
+                     BusScan-ScanServer) do
+    action :install
+    management_tools true
+    only_if '(Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain'
+  end
 end

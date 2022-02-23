@@ -57,4 +57,5 @@ windows_feature %w(NetFx4Extended-ASPNET45
                    Printing-Server-Role
                    Printing-InternetPrinting-Server) do
   action :install
+  management_tools true
 end

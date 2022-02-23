@@ -20,28 +20,15 @@ action :install do
     Chef::Log.debug("#{new_resource.driver_name} already installed - nothing to do.")
   else
     converge_by "Install Printer Driver #{new_resource.driver_name}" do
-      execute 'Sanitize Network Drives' do
-        command 'net use * /d /y'
+      Chef::Log.debug("pnputil.exe /a #{new_resource.inf_path}\\#{new_resource.inf_file}\"")
+      Chef::Log.debug("Add-PrinterDriver -Name \"#{new_resource.driver_name}\"")
+      powershell_script 'Add driver to Windows Store' do
+        code "pnputil.exe /a \"#{new_resource.inf_path}\\#{new_resource.inf_file}\""
       end
-      execute 'Map Network Drive' do
-        command "net use z: \"#{new_resource.inf_path}\" /user:\"#{new_resource.domain_username}\" \"#{new_resource.domain_password}\""
+      powershell_script "Installing print driver: #{new_resource.driver_name}" do
+        code "Add-PrinterDriver -Name \"#{new_resource.driver_name}\""
       end
-      execute 'Create Local Cache' do
-        command "xcopy \"#{new_resource.inf_path}\" \"C:\\chef\\cache\\#{new_resource.driver_name}\" /Y /S /I"
-      end
-      execute 'Unmap Network Drive' do
-        command 'net use z: /d'
-      end
-      execute "Creating print driver: #{new_resource.driver_name}" do
-        command "rundll32 printui.dll PrintUIEntry /ia /m \"#{new_resource.driver_name}\" /h \"#{new_resource.environment}\" /v \"#{new_resource.version}\" /f \"C:\\chef\\cache\\#{new_resource.driver_name}\\#{new_resource.inf_file}\""
-      end
-
-      Chef::Log.debug("#{new_resource.driver_name} installed.")
-
-      execute 'Cleanup' do
-        command "rmdir \"C:\\chef\\cache\\#{new_resource.driver_name}\" /S /Q"
-        returns [0, 1]
-      end
+      Chef::Log.info("#{new_resource.driver_name} installed.")
     end
   end
 end
