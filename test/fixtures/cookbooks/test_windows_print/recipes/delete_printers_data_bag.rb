@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: windows_print
+# Cookbook:: windows_print
 # Recipe:: remove_printer_data_bag
 #
-# Copyright 2013, Texas A&M
+# Copyright:: 2013, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -28,7 +28,6 @@ printers = data_bag('printers_del')
 Chef::Log.error('Data bag cannot be empty') if printers.empty?
 
 printers.each do |printer|
-
   printer_info = data_bag_item('printers_del', printer)
 
   windows_print_printer(printer) do
@@ -45,7 +44,7 @@ printers.each do |printer|
     domain_username printer_info['domain_username']
     domain_password printer_info['domain_password']
   end
-  
+
   windows_print_port(printer) do
     action [:delete]
     ports printer_info['ports']

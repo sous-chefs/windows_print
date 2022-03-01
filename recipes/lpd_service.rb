@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: windows_print
+# Cookbook:: windows_print
 # Recipe:: lpd_service
 #
-# Copyright 2013, Texas A&M
+# Copyright:: 2013, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,23 +23,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-if node['os_version'] >= "6.2" 
-  [
-    "Printing-Server-Foundation-Features",
-    "Printing-Server-Role",
-    "Printing-LPDPrintService"
-  ].each do |feature|
-    windows_feature feature do
-      action :install
-    end
-  end
-else
-  [
-    "Printing-Server-Role",
-    "Printing-LPDPrintService"
-  ].each do |feature|
-    windows_feature feature do
-      action :install
-    end
-  end
+
+windows_feature %w(Printing-Server-Foundation-Features
+                   Printing-Server-Role
+                   Printing-LPDPrintService) do
+  action :install
+  management_tools true
 end

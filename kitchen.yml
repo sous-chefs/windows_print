@@ -1,0 +1,72 @@
+---
+driver:
+  name: vagrant
+  customize:
+    cpus: 2
+    memory: 4096
+
+transport:
+  name: winrm
+  elevated: true
+
+provisioner:
+  name: chef_zero
+  deprecations_as_errors: true
+  chef_license: accept-no-persist
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: windows-2012r2
+    driver:
+      box: tas50/windows_2012r2
+  - name: windows-2016
+    driver:
+      box: tas50/windows_2016
+  - name: windows-2019
+    driver:
+      box: tas50/windows_2019
+
+suites:
+  - name: default
+    run_list:
+      - recipe[windows_print::default]
+    verifier:
+      inspec_tests:
+        - test/integration/default
+
+  - name: distributed-scan
+    run_list:
+      - recipe[test_windows_ad::setup_forest]
+      - recipe[windows_print::distributed_scan_server]
+    verifier:
+      inspec_tests:
+        - test/integration/distributed_scan_server
+    excludes:
+      - tas50/windows_2019
+
+  - name: internet-printing
+    run_list:
+      - recipe[windows_print::internet_printing]
+    verifier:
+      inspec_tests:
+        - test/integration/internet_printing
+
+  - name: lpd-service
+    run_list:
+      - recipe[windows_print::lpd_service]
+    verifier:
+      inspec_tests:
+        - test/integration/lpd_service
+
+  - name: resources
+    data_bags_path: "test/fixtures/data_bags"
+    run_list:
+      - recipe[windows_print::default]
+      - recipe[test_windows_print::create_printers_data_bag]
+      - recipe[test_windows_print::create_printer_settings_data_bag]
+      - recipe[test_windows_print::restore_printer_settings_data_bag]
+    verifier:
+      inspec_tests:
+        - test/integration/resources

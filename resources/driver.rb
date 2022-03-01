@@ -1,38 +1,82 @@
 #
-# Author:: Derek Groh (<dgroh@arch.tamu.edu>)
-# Cookbook Name:: windows_print
-# resource:: driver
+# Cookbook:: windows_print
+# Resource:: driver
 #
-# Copyright 2013, Texas A&M
-#
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject to
-# the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Copyright:: 2013, Texas A&M
 #
 
-actions :install, :delete
+unified_mode true
 
-default_action :install
+property :driver_name, String, name_property: true
+property :inf_path, String, required: true
+property :inf_file, String, required: true
+property :version, String, default: 'Type 3 - User Mode'
+property :environment, String, default: 'x64'
+property :domain_username, String
+property :domain_password, String
 
-attribute :driver_name, :kind_of => String, :name_attribute => true, :required => true
-attribute :inf_path, :kind_of => String, :required => true
-attribute :inf_file, :kind_of => String, :required => true
-attribute :version, :kind_of => String, :default => "Type 3 - User Mode"
-attribute :environment, :kind_of => String, :default => "x64"
-attribute :domain_username, :kind_of => String
-attribute :domain_password, :kind_of => String
+action :install do
+  if driver_exists?
+    Chef::Log.debug("#{new_resource.driver_name} already installed - nothing to do.")
+  else
+    converge_by "Install Printer Driver #{new_resource.driver_name}" do
+      Chef::Log.debug("pnputil.exe /a #{new_resource.inf_path}\\#{new_resource.inf_file}\"")
+      Chef::Log.debug("Add-PrinterDriver -Name \"#{new_resource.driver_name}\"")
+      powershell_script 'Add driver to Windows Store' do
+        code "pnputil.exe /a \"#{new_resource.inf_path}\\#{new_resource.inf_file}\""
+      end
+      powershell_script "Installing print driver: #{new_resource.driver_name}" do
+        code "Add-PrinterDriver -Name \"#{new_resource.driver_name}\""
+      end
+      Chef::Log.info("#{new_resource.driver_name} installed.")
+    end
+  end
+end
+
+action :delete do
+  if exists?
+    converge_by "Delete Printer Driver #{new_resource.driver_name}" do
+      execute "Deleting print driver: #{new_resource.driver_name}" do
+        command "rundll32 printui.dll PrintUIEntry /dd /m \"#{new_resource.driver_name}\" /h \"#{new_resource.environment}\" /v \"#{new_resource.version}\""
+      end
+    end
+  else
+    Chef::Log.debug("#{new_resource.driver_name} doesn't exist - can't delete.")
+  end
+end
+
+action_class do
+  def driver_exists?
+    case new_resource.environment
+    when 'x64'
+      check = powershell_out("Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows x64'} | fl name").run_command
+      Chef::Log.debug("\"#{new_resource.driver_name}\" x64 driver found.")
+    when 'x86'
+      check = powershell_out("Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Windows NT x86'} | fl name").run_command
+      Chef::Log.debug("\"#{new_resource.driver_name}\" x86 driver found.")
+    when 'Itanium'
+      check = powershell_out("Get-wmiobject -Class Win32_PrinterDriver -EnableAllPrivileges | where {$_.name -like '#{new_resource.driver_name},3,Itanium'} | fl name").run_command
+      Chef::Log.debug("\"#{new_resource.driver_name}\" xItanium driver found.")
+    else
+      Chef::Log.debug('Please use \"x64\", \"x86\" or \"Itanium\" as the environment type')
+    end
+    check.stdout.include?(new_resource.driver_name)
+  end
+
+  # Attempt to prevent typos in new_resource.name
+  def driver_name
+    case new_resource.environment
+    when 'x64'
+      File.readlines(new_resource.inf_path).grep(/NTamd64/)
+      # Grab Next line String Between " and " and make that new_resource.name
+    when 'x86'
+      File.readlines(new_resource.inf_path).grep(/NTx86/)
+      # Grab Next line String Between " and " and make that new_resource.name
+    when 'Itanium'
+      File.readlines(new_resource.inf_path).grep(/NTx86/)
+      # Grab Next line String Between " and " and make that new_resource.name
+    else
+      Chef::Log.debug('Please use \"x64\", \"x86\" or \"Itanium\" as the environment type')
+    end
+  end
+end

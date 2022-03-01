@@ -1,8 +1,8 @@
 #
-# Cookbook Name:: windows_print
+# Cookbook:: windows_print
 # Recipe:: distributed_scan_server
 #
-# Copyright 2013, Texas A&M
+# Copyright:: 2013, Texas A&M
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,22 +23,15 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-if node['os_version'] >= "6.2" 
-  [
-    "Printing-Server-Foundation-Features",
-    "FSRM-Infrastructure-Services",
-    "BusScan-ScanServer"
-  ].each do |feature|
-    windows_feature feature do
-      action :install
-    end
-  end
-else
-  [
-    "BusScan-ScanServer"
-  ].each do |feature|
-    windows_feature feature do
-      action :install
-    end
+
+# Not available in server 2019.
+# Requires system to be a domain member
+if Chef::Version.new(node['os_version']) < Chef::Version.new('10.0.17')
+  windows_feature %w(Printing-Server-Foundation-Features
+                     FSRM-Infrastructure-Services
+                     BusScan-ScanServer) do
+    action :install
+    management_tools true
+    only_if '(Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain'
   end
 end
