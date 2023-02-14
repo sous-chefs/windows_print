@@ -10,27 +10,27 @@ jobs:
   lint-unit:
     uses: sous-chefs/.github/.github/workflows/lint-unit.yml@0.0.3
 
-  integration-windows-2016:  # EOL March 15
+  integration-windows-2016: # EOL March 15
     needs: lint-unit
     runs-on: windows-2016
     strategy:
       matrix:
         os:
-          - 'windows-2016'
+          - "windows-2016"
         suite:
-          - 'default'
-          - 'internet-printing'
-          - 'lpd-service'
-          - 'resources'
+          - "default"
+          - "internet-printing"
+          - "lpd-service"
+          - "resources"
       fail-fast: false
 
     steps:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Install Chef
-        uses: actionshub/chef-install@main
+        uses: actionshub/chef-install@2.0.4
       - name: test-kitchen
-        uses: actionshub/test-kitchen@main
+        uses: actionshub/test-kitchen@2.1.0
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_LOCAL_YAML: kitchen_exec.yml
@@ -45,21 +45,21 @@ jobs:
     strategy:
       matrix:
         os:
-          - 'windows-2019'
+          - "windows-2019"
         suite:
-          - 'default'
-          - 'internet-printing'
-          - 'lpd-service'
-          - 'resources'
+          - "default"
+          - "internet-printing"
+          - "lpd-service"
+          - "resources"
       fail-fast: false
 
     steps:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Install Chef
-        uses: actionshub/chef-install@main
+        uses: actionshub/chef-install@2.0.4
       - name: test-kitchen
-        uses: actionshub/test-kitchen@main
+        uses: actionshub/test-kitchen@2.1.0
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_LOCAL_YAML: kitchen_exec.yml
