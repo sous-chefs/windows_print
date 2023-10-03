@@ -2,7 +2,7 @@
 
 This file is used to list changes made in each version of print.
 
-## Unreleased
+## 2.0.1 - *2023-10-03*
 
 - Standardise files with files in sous-chefs/repo-management
 - Transfer ownership to sous-chefs
