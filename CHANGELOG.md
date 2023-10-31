@@ -5,6 +5,7 @@ This file is used to list changes made in each version of print.
 ## Unreleased
 
 - Update CI permissions
+- Change LICENSE to Apache-2.0
 
 ## 2.0.1 - *2023-10-03*
 
