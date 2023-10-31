@@ -4,6 +4,8 @@ This file is used to list changes made in each version of print.
 
 ## Unreleased
 
+- Update CI permissions
+
 ## 2.0.1 - *2023-10-03*
 
 - Standardise files with files in sous-chefs/repo-management
