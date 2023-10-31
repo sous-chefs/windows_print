@@ -1,7 +1,7 @@
 name             'windows_print'
 maintainer       'Sous Chefs'
 maintainer_email 'help@sous-chefs.org'
-license          'MIT'
+license          'Apache-2.0'
 description      'Installs/Configures print'
 version          '2.0.1'
 source_url       'https://github.com/sous-chefs/windows_print'
