@@ -2,7 +2,7 @@
 
 This file is used to list changes made in each version of print.
 
-## Unreleased
+## 2.1.2 - *2024-05-03*
 
 ## 2.1.1 - *2024-05-03*
 
