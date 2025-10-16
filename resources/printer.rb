@@ -45,7 +45,7 @@ property :domain_username, String
 property :domain_password, String
 
 action :create do
-  converge_by("Creating Printer Port #{new_resource.port_name}, #{new_resource.ipv4_address}") do  # Does not report correctly
+  converge_by("Creating Printer Port #{new_resource.port_name}, #{new_resource.ipv4_address}") do # Does not report correctly
     new_resource.ports.each do |port_name, ipv4_address|
       windows_print_port port_name do
         ipv4_address ipv4_address
