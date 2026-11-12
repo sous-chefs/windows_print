@@ -1,0 +1,53 @@
+---
+name: native driver diagnostics
+
+"on":
+  push:
+    branches: [codex/windows-print-resources]
+
+jobs:
+  driver:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-2025]
+    steps:
+      - name: Check literal driver removal with local server
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Install-WindowsFeature Print-Server -ErrorAction Stop
+          $name = 'Generic / Text Only'
+          Add-PrinterDriver -Name $name -PrinterEnvironment 'Windows x64' -ErrorAction Stop
+          Add-PrinterPort -Name 'Kitchen driver diagnostic' -PrinterHostAddress '192.0.2.10'
+          Add-Printer -Name 'Kitchen driver [1]' -DriverName $name -PortName 'Kitchen driver diagnostic'
+          $queue = Get-Printer -ErrorAction Stop | Where-Object Name -eq 'Kitchen driver [1]'
+          Remove-Printer -InputObject $queue -ErrorAction Stop
+          foreach ($mode in @('default', 'local', 'name')) {
+            if ($null -eq (Get-PrinterDriver -ErrorAction Stop | Where-Object Name -eq $name)) {
+              Add-PrinterDriver -Name $name -PrinterEnvironment 'Windows x64' -ErrorAction Stop
+            }
+            try {
+              if ($mode -eq 'default') {
+                $target = Get-PrinterDriver -ErrorAction Stop | Where-Object Name -eq $name
+                Write-Output "Default server: [$($target.ComputerName)]"
+                Remove-PrinterDriver -InputObject $target -ErrorAction Stop
+              } elseif ($mode -eq 'local') {
+                $target = Get-PrinterDriver -ComputerName $env:COMPUTERNAME -ErrorAction Stop | Where-Object Name -eq $name
+                Write-Output "Explicit server: [$($target.ComputerName)]"
+                Remove-PrinterDriver -InputObject $target -ErrorAction Stop
+              } else {
+                Remove-PrinterDriver -Name $name -PrinterEnvironment 'Windows x64' -ComputerName $env:COMPUTERNAME -ErrorAction Stop
+              }
+              if ($null -ne (Get-PrinterDriver -ErrorAction Stop | Where-Object Name -eq $name)) {
+                throw 'Driver still present after deletion'
+              }
+              Write-Output "$mode removal verified"
+            } catch {
+              Write-Output "$mode removal failed"
+              $_ | Format-List * -Force
+              $_.Exception | Format-List * -Force
+            }
+          }
