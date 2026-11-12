@@ -27,6 +27,14 @@ describe WindowsPrintCookbook::Helpers do
     expect(script).to include('Get-PrinterPort -ComputerName $env:COMPUTERNAME -ErrorAction Stop', 'Remove-PrinterPort -InputObject $target')
   end
 
+  it 'selects the exact driver environment from the explicit local server before deletion' do
+    script = helper.mutate_print_object(:driver, 'Office [1]', 'Remove-PrinterDriver', 'Windows x64')
+    expect(script).to include('Get-PrinterDriver -ComputerName $env:COMPUTERNAME -ErrorAction Stop',
+                              "$_.Name -eq 'Office [1]' -and $_.PrinterEnvironment -eq 'Windows x64'",
+                              'Remove-PrinterDriver -InputObject $target')
+    expect(script).not_to include('Remove-PrinterDriver -Name')
+  end
+
   it 'rejects invalid PowerShell string input' do
     expect { helper.ps_literal("bad\0name") }.to raise_error(ArgumentError)
   end

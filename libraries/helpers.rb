@@ -100,7 +100,7 @@ module WindowsPrintCookbook
     def mutate_print_object(kind, name, command, environment = nil)
       <<~POWERSHELL
         $ErrorActionPreference = 'Stop'
-        $target = #{print_selection(kind, name, environment, local_server: kind == :port)}
+        $target = #{print_selection(kind, name, environment, local_server: [:port, :driver].include?(kind))}
         if ($null -ne $target) { #{command} -InputObject $target -ErrorAction Stop }
       POWERSHELL
     end
