@@ -90,7 +90,7 @@ module WindowsPrintCookbook
       <<~POWERSHELL
         $ErrorActionPreference = 'Stop'
         $target = #{print_selection(kind, name, environment)}
-        if ($null -ne $target) { $target | #{command} -ErrorAction Stop }
+        if ($null -ne $target) { #{command} -InputObject $target -ErrorAction Stop }
       POWERSHELL
     end
   end

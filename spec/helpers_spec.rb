@@ -16,6 +16,12 @@ describe WindowsPrintCookbook::Helpers do
     expect(helper.print_selection(:printer, 'Office [1]*')).not_to include('-like')
   end
 
+  it 'passes the exact object explicitly when deleting names containing wildcards' do
+    script = helper.mutate_print_object(:printer, 'Office [1]*', 'Remove-Printer')
+    expect(script).to include("$_.Name -eq 'Office [1]*'", 'Remove-Printer -InputObject $target')
+    expect(script).not_to include('$target | Remove-Printer')
+  end
+
   it 'rejects invalid PowerShell string input' do
     expect { helper.ps_literal("bad\0name") }.to raise_error(ArgumentError)
   end
