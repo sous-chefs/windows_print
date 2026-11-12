@@ -178,6 +178,7 @@ describe 'windows_print_printer' do
     it 'updates the exact printer rather than creating a duplicate' do
       expect(chef_run).to run_powershell_script('Configure printer Office')
       expect(chef_run.powershell_script('Configure printer Office').code).to include("$_.Name -eq 'Office'", 'Set-Printer')
+      expect(chef_run.powershell_script('Configure printer Office').code).to include('$target.Shared = $false', 'Set-Printer -InputObject $target')
     end
   end
 

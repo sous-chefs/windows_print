@@ -28,7 +28,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022, windows-2025]
-        suite: [default, internet-printing, lpd-service, resources]
+        suite: >-
+          ${{ fromJSON(
+            github.event_name == 'push' &&
+            github.ref_name == 'codex/windows-print-resources' &&
+            '["resources"]' ||
+            '["default", "internet-printing", "lpd-service", "resources"]'
+          ) }}
     env:
       CHEF_LICENSE: accept-no-persist
       WINDOWS_PLATFORM: ${{ matrix.os }}

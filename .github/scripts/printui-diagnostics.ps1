@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Continue'
-Get-Printer | Where-Object Name -eq 'Kitchen Office [1] & %LITERAL_ENV%' | Format-List Name, DriverName, PortName
+Get-Printer | Where-Object Name -eq 'Kitchen Office [1] & %LITERAL_ENV%' | Format-List Name, DriverName, PortName, Comment, Location, Shared, ShareName
 Get-PrintConfiguration -PrinterName 'Kitchen Office [1] & %LITERAL_ENV%' | Format-List PaperSize
 $directory = Join-Path $env:RUNNER_TEMP 'printui-diagnostics'
 New-Item -ItemType Directory -Path $directory -Force | Out-Null

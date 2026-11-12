@@ -91,7 +91,14 @@ action :create do
   if changed
     args = desired.reject { |key, _| key == 'Shared' }.map { |key, value| "-#{key} #{ps_literal(value)}" }.join(' ')
     code = if current
-             mutate_print_object(:printer, new_resource.printer_name, "Set-Printer #{args} -Shared:$#{desired['Shared']}")
+             assignments = desired.map { |key, value| "$target.#{key} = #{key == 'Shared' ? "$#{value}" : ps_literal(value)}" }.join("\n")
+             <<~POWERSHELL
+               $ErrorActionPreference = 'Stop'
+               $target = #{print_selection(:printer, new_resource.printer_name)}
+               if ($null -eq $target) { throw 'Printer disappeared before it could be updated' }
+               #{assignments}
+               Set-Printer -InputObject $target -ErrorAction Stop
+             POWERSHELL
            else
              shared = desired['Shared'] ? ' -Shared' : ''
              "$ErrorActionPreference = 'Stop'; Add-Printer -Name #{ps_literal(new_resource.printer_name)} #{args}#{shared} -ErrorAction Stop"
