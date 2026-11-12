@@ -18,6 +18,7 @@
 * Printer deletion must retain drivers and ports, which may be shared by other queues. Remove them explicitly after queues no longer use them.
 * Preserve native driver-store packages on driver deletion because other drivers/devices may use the same package.
 * Local macOS cannot execute PrintManagement. ChefSpec covers resource actions; hosted native Windows Kitchen must verify lifecycle and second-converge idempotence before merge.
+* Protected-file checks use `pull_request_target` because the shared action requires it. Keep this workflow API-only: never check out or execute pull-request content with its write token.
 
 ## Sources
 
