@@ -2,6 +2,22 @@
 
 This file is used to list changes made in each version of print.
 
+## [3.0.0](https://github.com/sous-chefs/windows_print/compare/v2.1.4...v3.0.0) (2026-11-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate Windows Print to custom resources ([#51](https://github.com/sous-chefs/windows_print/issues/51))
+
+### Features
+
+* migrate Windows Print to custom resources ([#51](https://github.com/sous-chefs/windows_print/issues/51)) ([9210f45](https://github.com/sous-chefs/windows_print/commit/9210f4541ddd7552f401addcffdbe58e822c89cf))
+
+
+### Bug Fixes
+
+* **ci:** Update workflows to use release pipeline ([#38](https://github.com/sous-chefs/windows_print/issues/38)) ([3870bcb](https://github.com/sous-chefs/windows_print/commit/3870bcb86264e8b36da0cd18d07265e9d1cdb7d7))
+
 ## [2.1.4](https://github.com/sous-chefs/windows_print/compare/2.1.3...v2.1.4) (2025-10-16)
 
 
