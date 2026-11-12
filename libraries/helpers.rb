@@ -18,10 +18,11 @@ module WindowsPrintCookbook
       "'#{value.to_s.gsub("'", "''")}'"
     end
 
-    def print_selection(kind, name, environment = nil)
+    def print_selection(kind, name, environment = nil, local_server: false)
       filter = "$_.Name -eq #{ps_literal(name)}"
       filter += " -and $_.PrinterEnvironment -eq #{ps_literal(environment)}" if environment
-      "#{COMMANDS.fetch(kind)} -ErrorAction Stop | Where-Object { #{filter} }"
+      server = local_server ? ' -ComputerName $env:COMPUTERNAME' : ''
+      "#{COMMANDS.fetch(kind)}#{server} -ErrorAction Stop | Where-Object { #{filter} }"
     end
 
     def print_state(kind, name, environment = nil)
@@ -99,7 +100,7 @@ module WindowsPrintCookbook
     def mutate_print_object(kind, name, command, environment = nil)
       <<~POWERSHELL
         $ErrorActionPreference = 'Stop'
-        $target = #{print_selection(kind, name, environment)}
+        $target = #{print_selection(kind, name, environment, local_server: kind == :port)}
         if ($null -ne $target) { #{command} -InputObject $target -ErrorAction Stop }
       POWERSHELL
     end

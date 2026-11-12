@@ -22,6 +22,11 @@ describe WindowsPrintCookbook::Helpers do
     expect(script).not_to include('$target | Remove-Printer')
   end
 
+  it 'selects ports from the explicit local server before deleting their object' do
+    script = helper.mutate_print_object(:port, 'Office [1]', 'Remove-PrinterPort')
+    expect(script).to include('Get-PrinterPort -ComputerName $env:COMPUTERNAME -ErrorAction Stop', 'Remove-PrinterPort -InputObject $target')
+  end
+
   it 'rejects invalid PowerShell string input' do
     expect { helper.ps_literal("bad\0name") }.to raise_error(ArgumentError)
   end
