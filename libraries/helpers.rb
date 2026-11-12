@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'securerandom'
 
 module WindowsPrintCookbook
   module Helpers
@@ -47,6 +48,40 @@ module WindowsPrintCookbook
       raise "Windows printing administration script #{name} is unavailable" unless script
 
       script
+    end
+
+    # Start-Process accepts one Windows command-line string. Quote every value
+    # according to CommandLineToArgvW rules, then keep that string literal in PS.
+    def windows_arguments(arguments)
+      arguments.map do |value|
+        argument = value.to_s
+        raise ArgumentError, 'Native arguments cannot contain NUL bytes' if argument.include?("\0")
+
+        escaped = argument.gsub(/(\\*)"/) { "#{Regexp.last_match(1) * 2}\\\"" }
+        trailing = escaped[/\\+\z/]
+        escaped += trailing if trailing
+        "\"#{escaped}\""
+      end.join(' ')
+    end
+
+    def windows_executable(name)
+      "#{ENV.fetch('SystemRoot', 'C:/Windows').tr('/', '\\')}\\System32\\#{name}"
+    end
+
+    def native_powershell(executable, arguments, acceptable_exit_codes: [0])
+      <<~POWERSHELL
+        $ErrorActionPreference = 'Stop'
+        $process = Start-Process -FilePath #{ps_literal(executable)} -ArgumentList #{ps_literal(windows_arguments(arguments))} -NoNewWindow -Wait -PassThru -ErrorAction Stop
+        if ($process.ExitCode -notin @(#{acceptable_exit_codes.map { |code| Integer(code) }.join(', ')})) {
+          throw "Native command failed with exit code $($process.ExitCode)"
+        }
+      POWERSHELL
+    end
+
+    def commit_backup!(staged, destination)
+      raise "PrintUI did not create a non-empty backup at #{staged}" unless ::File.file?(staged) && ::File.size(staged).positive?
+
+      ::File.rename(staged, destination)
     end
 
     def mutate_print_object(kind, name, command, environment = nil)

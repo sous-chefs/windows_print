@@ -43,8 +43,9 @@ action :restore do
   raise "Printer settings file #{settings} does not exist" unless ::File.file?(settings)
   raise "Printer #{new_resource.printer_name} does not exist" unless print_state(:printer, new_resource.printer_name)
 
-  execute "Restore printer settings #{new_resource.printer_name}" do
-    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Sr', '/n', new_resource.printer_name, '/a', settings.tr('/', '\\'), 'd', 'u', 'g', 'r', '/q']
+  invocation = native_powershell(windows_executable('rundll32.exe'), ['printui.dll,PrintUIEntry', '/Sr', '/n', new_resource.printer_name, '/a', settings.tr('/', '\\'), '/q', 'd', 'u', 'g', 'r'])
+  powershell_script "Restore printer settings #{new_resource.printer_name}" do
+    code invocation
   end
 end
 
@@ -56,14 +57,19 @@ action :create do
   end
 
   settings = ::File.join(new_resource.path, new_resource.file)
-  execute "Back up printer settings #{new_resource.printer_name}" do
-    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Ss', '/n', new_resource.printer_name, '/a', settings.tr('/', '\\'), 'd', 'u', 'g', '/q']
-  end
-
-  ruby_block "Verify printer settings backup #{new_resource.printer_name}" do
-    block do
-      raise "PrintUI did not create a non-empty backup at #{settings}" unless ::File.file?(settings) && ::File.size(settings).positive?
+  staged = ::File.join(::File.dirname(settings), ".#{::File.basename(settings)}.#{SecureRandom.hex(8)}.tmp")
+  finalize = method(:commit_backup!)
+  begin
+    invocation = native_powershell(windows_executable('rundll32.exe'), ['printui.dll,PrintUIEntry', '/Ss', '/n', new_resource.printer_name, '/a', staged.tr('/', '\\'), '/q', 'd', 'u', 'g'])
+    powershell_script "Back up printer settings #{new_resource.printer_name}" do
+      code invocation
     end
+
+    ruby_block "Verify printer settings backup #{new_resource.printer_name}" do
+      block { finalize.call(staged, settings) }
+    end
+  ensure
+    ::File.delete(staged) if ::File.exist?(staged)
   end
 end
 

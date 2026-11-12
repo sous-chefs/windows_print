@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 include_recipe 'test::default'
+include_recipe 'test::native_arguments'
 
 windows_print_printer 'Kitchen Office [1]' do
   driver_name 'Generic / Text Only'

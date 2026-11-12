@@ -79,8 +79,8 @@ describe 'windows_print_port' do
   end
 
   it 'updates an existing TCP port without removing its queues' do
-    expect(chef_run).to run_execute('Configure printer port Office TCP')
-    expect(chef_run.execute('Configure printer port Office TCP').command).to end_with('-t', '-r', 'Office TCP', '-h', '192.0.2.10')
+    expect(chef_run).to run_powershell_script('Configure printer port Office TCP')
+    expect(chef_run.powershell_script('Configure printer port Office TCP').code).to include('"-t" "-r" "Office TCP" "-h" "192.0.2.10"')
   end
 
   context 'when already configured' do
@@ -111,8 +111,8 @@ describe 'windows_print_printer_settings' do
   end
 
   it 'restores an existing backup and passes arguments separately' do
-    expect(chef_run).to run_execute('Restore printer settings Office')
-    expect(chef_run.execute('Restore printer settings Office').command).to include('/Sr', '/a', 'C:\\backups\\office.bin', '/q')
+    expect(chef_run).to run_powershell_script('Restore printer settings Office')
+    expect(chef_run.powershell_script('Restore printer settings Office').code).to include('"/Sr"', '"/a"', 'C:\\backups\\office.bin', '"/q" "d" "u" "g" "r"')
   end
 
   context 'creating a backup' do
@@ -125,9 +125,8 @@ describe 'windows_print_printer_settings' do
     end
 
     it 'uses native Windows path separators and verifies the backup' do
-      expect(chef_run.execute('Back up printer settings Office').command).to include('C:\\backups\\office.bin')
+      expect(chef_run.powershell_script('Back up printer settings Office').code).to include('C:\\backups\\.office.bin.')
       expect(chef_run).to run_ruby_block('Verify printer settings backup Office')
-      allow(File).to receive(:file?).with('C:/backups/office.bin').and_return(false)
       expect { chef_run.ruby_block('Verify printer settings backup Office').block.call }.to raise_error(/did not create a non-empty backup/)
     end
   end

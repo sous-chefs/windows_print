@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require_relative '../libraries/helpers'
+require 'tmpdir'
 
 describe WindowsPrintCookbook::Helpers do
   subject(:helper) { Object.new.extend(described_class) }
@@ -34,5 +35,44 @@ describe WindowsPrintCookbook::Helpers do
   it 'rejects ambiguous results instead of modifying several objects' do
     allow(helper).to receive(:powershell_out!).and_return(double(stdout: '[{"Name":"Office"},{"Name":"Office"}]'))
     expect { helper.print_state(:printer, 'Office') }.to raise_error(/more than one/)
+  end
+
+  it 'quotes every native argument, including shell metacharacters and empty values' do
+    expect(helper.windows_arguments(['one&two', 'one|two', '%LITERAL_ENV%', '', 'two words'])).to eq '"one&two" "one|two" "%LITERAL_ENV%" "" "two words"'
+  end
+
+  it 'preserves quotes and trailing backslashes under Windows argument parsing' do
+    expect(helper.windows_arguments(['say "hello"'])).to eq '"say \"hello\""'
+    expect(helper.windows_arguments(['trailing\\'])).to eq('"trailing' + ('\\' * 2) + '"')
+  end
+
+  it 'invokes a native process without passing values through cmd.exe' do
+    script = helper.native_powershell('C:\\Windows\\System32\\cscript.exe', ["O'Brien&%NAME%|value"])
+    expect(script).to include('Start-Process -FilePath', "'\"O''Brien&%NAME%|value\"'", '$process.ExitCode -notin @(0)')
+    expect(script).not_to include('cmd.exe', 'Invoke-Expression')
+  end
+
+  it 'preserves an existing backup when a fresh export is missing or empty' do
+    Dir.mktmpdir('print-backup') do |dir|
+      destination = File.join(dir, 'backup.bin')
+      staged = File.join(dir, 'fresh.tmp')
+      File.write(destination, 'previous backup')
+      expect { helper.commit_backup!(staged, destination) }.to raise_error(/non-empty backup/)
+      File.write(staged, '')
+      expect { helper.commit_backup!(staged, destination) }.to raise_error(/non-empty backup/)
+      expect(File.read(destination)).to eq 'previous backup'
+    end
+  end
+
+  it 'replaces the destination only after validating a fresh export' do
+    Dir.mktmpdir('print-backup') do |dir|
+      destination = File.join(dir, 'backup.bin')
+      staged = File.join(dir, 'fresh.tmp')
+      File.write(destination, 'previous backup')
+      File.write(staged, 'fresh backup')
+      helper.commit_backup!(staged, destination)
+      expect(File.read(destination)).to eq 'fresh backup'
+      expect(File.exist?(staged)).to be false
+    end
   end
 end
