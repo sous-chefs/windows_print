@@ -37,7 +37,6 @@ property :file, String, required: true
 default_action :restore
 
 action :restore do
-  validate_printui_name!
   settings = ::File.join(new_resource.path, new_resource.file)
   raise "Printer settings file #{settings} does not exist" unless ::File.file?(settings)
   raise "Printer #{new_resource.printer_name} does not exist" unless print_state(:printer, new_resource.printer_name)
@@ -49,7 +48,6 @@ action :restore do
 end
 
 action :create do
-  validate_printui_name!
   raise "Printer #{new_resource.printer_name} does not exist" unless print_state(:printer, new_resource.printer_name)
 
   directory new_resource.path do
@@ -81,10 +79,4 @@ end
 
 action_class do
   include WindowsPrintCookbook::Helpers
-
-  def validate_printui_name!
-    return unless new_resource.printer_name.include?('"')
-
-    raise ArgumentError, 'PrintUI settings operations do not support printer names containing double quotes'
-  end
 end

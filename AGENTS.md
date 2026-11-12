@@ -12,7 +12,8 @@
 ## Native Windows behaviour
 
 * Windows Print and Document Services is an operating-system feature; no source build is needed. Printer drivers must match the installed Windows environment and come from the operator's trusted source.
-* Use exact object selection and PowerShell single-quoted literals. PrintManagement's name parameters can accept wildcards; mutating a previously selected object avoids unintended matches.
+* Use exact object selection and PowerShell single-quoted literals. Pass selected CIM objects explicitly with `-InputObject`; pipeline binding can reinterpret their names as wildcard patterns.
+* Native programs have distinct parsers. Keep PrintUI syntax tokens bare, use the Script Host argument encoder for `cscript`, and never send resource values through `cmd.exe`. Preserve the native argument-recording regressions.
 * Query failures must propagate rather than being interpreted as missing objects.
 * Printer deletion must retain drivers and ports, which may be shared by other queues. Remove them explicitly after queues no longer use them.
 * Preserve native driver-store packages on driver deletion because other drivers/devices may use the same package.

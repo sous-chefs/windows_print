@@ -39,6 +39,9 @@ CI runs the default, Internet Printing, LPD and resources suites on Windows Serv
 run. Resource tests use the Windows inbox Generic/Text Only driver, a reserved
 documentation IP address, and a settings backup/restore roundtrip. Lifecycle tests
 update the port and queue, then delete the queue, port, driver and backup.
+The queue name includes brackets, embedded quotes, an ampersand and a percent
+expression. A similarly named sibling verifies that updates and deletion target
+only the selected queue and retain shared dependencies until explicitly removed.
 
 Older supported Windows Server versions can use the same native exec harness by
 setting `WINDOWS_PLATFORM` to their instance label. Distributed Scan needs a

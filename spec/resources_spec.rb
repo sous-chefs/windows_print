@@ -95,6 +95,18 @@ describe 'windows_print_port' do
     end
   end
 
+  context 'when a port name would become a Script Host option' do
+    recipe do
+      windows_print_port '//B' do
+        ipv4_address '192.0.2.10'
+      end
+    end
+
+    it 'rejects the host option before invoking the script' do
+      expect { chef_run }.to raise_error(ArgumentError, /beginning with.*Windows Script Host/)
+    end
+  end
+
   context 'when already configured' do
     let(:state) { super().merge('PrinterHostAddress' => '192.0.2.10') }
 
@@ -125,23 +137,6 @@ describe 'windows_print_printer_settings' do
   it 'restores an existing backup and passes arguments separately' do
     expect(chef_run).to run_powershell_script('Restore printer settings Office')
     expect(chef_run.powershell_script('Restore printer settings Office').code).to include('/Sr', '/a', 'C:\\backups\\office.bin', '/q d u g r')
-  end
-
-  [:create, :restore].each do |settings_action|
-    context "when #{settings_action} receives an embedded quote" do
-      recipe do
-        windows_print_printer_settings 'Office "quoted"' do
-          path 'C:/backups'
-          file 'office.bin'
-          action settings_action
-        end
-      end
-
-      it 'fails before querying the printer or invoking native commands' do
-        expect_any_instance_of(Chef::Provider).not_to receive(:powershell_out!)
-        expect { chef_run }.to raise_error(ArgumentError, /names containing double quotes/)
-      end
-    end
   end
 
   context 'creating a backup' do

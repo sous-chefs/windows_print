@@ -31,7 +31,3 @@ other backups.
 The Chef/Cinc execution account must have permission to access the backup path,
 including any network share. This resource does not accept separate credentials
 or impersonate another account.
-
-Settings export and restore reject printer names containing double quotes before
-making changes. PrintUI does not safely parse those names with Windows argument
-escaping. Printer creation, update and deletion remain available for these names.

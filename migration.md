@@ -35,12 +35,9 @@ existing backup and printer, and fails clearly if either is missing.
 It no longer silently skips a valid backup.
 Backup writes a fresh temporary file, validates that it is non-empty, then
 replaces the selected backup. A failed export preserves the previous backup.
-Settings operations reject printer names containing double quotes: native
-PrintUI does not safely parse them with Windows argument escaping. This does not
-restrict printer creation, update or deletion.
-TCP/IP address updates also reject port names containing double quotes because
-Windows Script Host changes those arguments. Port creation and deletion remain
-available for those names.
+TCP/IP address updates also reject port names containing double quotes or
+beginning with `//`, which Windows Script Host changes or consumes as host
+options. Port creation and deletion remain available for those names.
 
 ## Platforms
 

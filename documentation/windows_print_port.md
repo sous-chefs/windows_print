@@ -1,8 +1,9 @@
 # windows_print_port
 
 Address updates use Windows Script Host, which cannot preserve embedded double
-quotes in port-name arguments. Such updates fail before mutation. Port creation
-and deletion do not use Script Host and retain literal-name handling.
+quotes in port-name arguments and consumes names beginning with `//` as host
+options. Such updates fail before mutation. Port creation and deletion do not use
+Script Host and retain literal-name handling.
 
 Creates, updates or deletes one standard TCP/IP printer port.
 Actions: `:create` (default), `:delete`.

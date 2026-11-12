@@ -70,16 +70,6 @@ jobs:
           }
           kitchen destroy $instance
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Diagnose PrintUI export on the disposable runner
-        if: failure() && matrix.suite == 'resources'
-        shell: pwsh
-        timeout-minutes: 3
-        run: ./.github/scripts/printui-diagnostics.ps1
-      - name: Probe PrintUI quoted names on the disposable runner
-        if: always() && matrix.suite == 'resources'
-        shell: pwsh
-        timeout-minutes: 3
-        run: ./.github/scripts/printui-name-probe.ps1
       - name: Preserve Kitchen diagnostics
         if: always()
         uses: actions/upload-artifact@v7
