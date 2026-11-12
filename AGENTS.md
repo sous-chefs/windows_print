@@ -18,7 +18,6 @@
 * Printer deletion must retain drivers and ports, which may be shared by other queues. Remove them explicitly after queues no longer use them.
 * Preserve native driver-store packages on driver deletion because other drivers/devices may use the same package.
 * Local macOS cannot execute PrintManagement. ChefSpec covers resource actions; hosted native Windows Kitchen must verify lifecycle and second-converge idempotence before merge.
-* The feature branch has a temporary, exact branch push trigger to obtain native Kitchen evidence before opening a PR. Remove that extra push branch after the first complete native run; retain normal PR and main-branch checks.
 
 ## Sources
 
