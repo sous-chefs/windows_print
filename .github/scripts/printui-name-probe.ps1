@@ -28,6 +28,9 @@ try {
     if (Test-Path -LiteralPath $output) {
       Get-Item -LiteralPath $output | Select-Object Name, Length
       Set-PrintConfiguration -PrinterName $name -PaperSize A4
+      if ((Get-PrintConfiguration -PrinterName $name).PaperSize -ne 'A4') {
+        throw 'The quoted-name probe did not change to A4 before restore'
+      }
       $arguments = 'printui.dll,PrintUIEntry /Sr /n ' + $case.Argument + ' /a "' + $output + '" /q d u g r'
       $process = Start-Process -FilePath "$env:SystemRoot\System32\rundll32.exe" -ArgumentList $arguments -NoNewWindow -PassThru
       if (-not $process.WaitForExit(15000)) {

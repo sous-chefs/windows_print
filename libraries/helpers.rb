@@ -70,10 +70,20 @@ module WindowsPrintCookbook
       "#{ENV.fetch('SystemRoot', 'C:/Windows').tr('/', '\\')}\\System32\\#{name}"
     end
 
-    def native_powershell(executable, arguments, acceptable_exit_codes: [0])
+    def script_host_arguments(arguments)
+      arguments.map do |value|
+        argument = value.to_s
+        raise ArgumentError, 'Windows Script Host arguments cannot contain NUL bytes or double quotes' if argument.include?("\0") || argument.include?('"')
+
+        argument.match?(%r{\A[a-zA-Z0-9_.,:/-]+\z}) ? argument : "\"#{argument}\""
+      end.join(' ')
+    end
+
+    def native_powershell(executable, arguments, acceptable_exit_codes: [0], script_host: false)
+      command_line = script_host ? script_host_arguments(arguments) : windows_arguments(arguments)
       <<~POWERSHELL
         $ErrorActionPreference = 'Stop'
-        $process = Start-Process -FilePath #{ps_literal(executable)} -ArgumentList #{ps_literal(windows_arguments(arguments))} -NoNewWindow -Wait -PassThru -ErrorAction Stop
+        $process = Start-Process -FilePath #{ps_literal(executable)} -ArgumentList #{ps_literal(command_line)} -NoNewWindow -Wait -PassThru -ErrorAction Stop
         if ($process.ExitCode -notin @(#{acceptable_exit_codes.map { |code| Integer(code) }.join(', ')})) {
           throw "Native command failed with exit code $($process.ExitCode)"
         }

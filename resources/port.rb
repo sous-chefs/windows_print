@@ -45,7 +45,7 @@ action :create do
     raise "Port #{new_resource.port_name} exists but is not a TCP/IP printer port"
   elsif current['PrinterHostAddress'] != new_resource.ipv4_address
     script = printer_admin_script('prnport.vbs')
-    invocation = native_powershell(windows_executable('cscript.exe'), ['//B', '//NoLogo', script, '-t', '-r', new_resource.port_name, '-h', new_resource.ipv4_address])
+    invocation = native_powershell(windows_executable('cscript.exe'), ['//B', '//NoLogo', script, '-t', '-r', new_resource.port_name, '-h', new_resource.ipv4_address], script_host: true)
     powershell_script "Configure printer port #{new_resource.port_name}" do
       code invocation
     end

@@ -38,6 +38,9 @@ replaces the selected backup. A failed export preserves the previous backup.
 Settings operations reject printer names containing double quotes: native
 PrintUI does not safely parse them with Windows argument escaping. This does not
 restrict printer creation, update or deletion.
+TCP/IP address updates also reject port names containing double quotes because
+Windows Script Host changes those arguments. Port creation and deletion remain
+available for those names.
 
 ## Platforms
 

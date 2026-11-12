@@ -83,6 +83,18 @@ describe 'windows_print_port' do
     expect(chef_run.powershell_script('Configure printer port Office TCP').code).to include('-t -r "Office TCP" -h 192.0.2.10')
   end
 
+  context 'when an address update has a quoted port name' do
+    recipe do
+      windows_print_port 'Office "quoted" TCP' do
+        ipv4_address '192.0.2.10'
+      end
+    end
+
+    it 'rejects arguments that Windows Script Host would change' do
+      expect { chef_run }.to raise_error(ArgumentError, /Windows Script Host.*double quotes/)
+    end
+  end
+
   context 'when already configured' do
     let(:state) { super().merge('PrinterHostAddress' => '192.0.2.10') }
 

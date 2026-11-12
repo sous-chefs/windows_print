@@ -63,6 +63,12 @@ describe WindowsPrintCookbook::Helpers do
     expect(script).not_to include('cmd.exe', 'Invoke-Expression')
   end
 
+  it 'uses Script Host quoting without doubling literal trailing backslashes' do
+    expect(helper.script_host_arguments(['one&two', '%LITERAL_ENV%', 'trailing\\'])).to eq '"one&two" "%LITERAL_ENV%" "trailing\\"'
+    expect { helper.script_host_arguments(['say "hello"']) }.to raise_error(ArgumentError, /double quotes/)
+    expect { helper.script_host_arguments(["bad\0name"]) }.to raise_error(ArgumentError, /NUL/)
+  end
+
   it 'preserves an existing backup when a fresh export is missing or empty' do
     Dir.mktmpdir('print-backup') do |dir|
       destination = File.join(dir, 'backup.bin')

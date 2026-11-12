@@ -10,7 +10,8 @@ script_output = ::File.join(probe_dir, 'script-arguments.txt').tr('/', '\\')
 probe_marker = ::File.join(probe_dir, 'verified')
 values = ['one&two', 'one|two', '%LITERAL_ENV%', 'two words', 'say "hello"', "O'Brien", 'trailing\\', '$(literal)', '']
 expected = values.map { |value| helper.ps_literal([value].pack('m0')) }.join(', ')
-expected_values = values.map { |value| helper.ps_literal(value) }.join(', ')
+script_values = values.reject { |value| value.include?('"') }
+expected_values = script_values.map { |value| helper.ps_literal(value) }.join(', ')
 
 directory probe_dir do
   recursive true
@@ -52,7 +53,7 @@ powershell_script 'Verify literal native argument transport' do
     output.Close
     '@
     Set-Content -LiteralPath #{helper.ps_literal(script_path)} -Value $scriptSource -Encoding ASCII
-    #{helper.native_powershell(helper.windows_executable('cscript.exe'), ['//B', '//NoLogo', script_path, script_output] + values)}
+    #{helper.native_powershell(helper.windows_executable('cscript.exe'), ['//B', '//NoLogo', script_path, script_output] + script_values, script_host: true)}
     $actual = @(Get-Content -LiteralPath #{helper.ps_literal(script_output)})
     $expected = @(#{expected_values})
     if ($actual.Count -ne $expected.Count) { throw 'Windows Script Host argument count changed' }
