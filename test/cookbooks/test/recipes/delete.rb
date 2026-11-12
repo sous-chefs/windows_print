@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-windows_print_printer 'Kitchen Office [1]' do
+windows_print_printer 'Kitchen Office [1] & %LITERAL_ENV%' do
   action :delete
 end
 

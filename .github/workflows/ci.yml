@@ -69,6 +69,11 @@ jobs:
         shell: pwsh
         timeout-minutes: 3
         run: ./.github/scripts/printui-diagnostics.ps1
+      - name: Probe PrintUI quoted names on the disposable runner
+        if: always() && matrix.suite == 'resources'
+        shell: pwsh
+        timeout-minutes: 3
+        run: ./.github/scripts/printui-name-probe.ps1
       - name: Preserve Kitchen diagnostics
         if: always()
         uses: actions/upload-artifact@v7

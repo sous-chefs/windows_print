@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 [
-  "Get-Printer | Where-Object Name -eq 'Kitchen Office [1]'",
+  "Get-Printer | Where-Object Name -eq 'Kitchen Office [1] & %LITERAL_ENV%'",
   "Get-PrinterPort | Where-Object Name -eq 'Kitchen TCP [1]'",
   "Get-PrinterDriver | Where-Object Name -eq 'Generic / Text Only'",
 ].each do |query|

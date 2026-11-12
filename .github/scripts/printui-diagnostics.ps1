@@ -1,14 +1,14 @@
 $ErrorActionPreference = 'Continue'
-Get-Printer | Where-Object Name -eq 'Kitchen Office [1]' | Format-List Name, DriverName, PortName
-Get-PrintConfiguration -PrinterName 'Kitchen Office [1]' | Format-List PaperSize
+Get-Printer | Where-Object Name -eq 'Kitchen Office [1] & %LITERAL_ENV%' | Format-List Name, DriverName, PortName
+Get-PrintConfiguration -PrinterName 'Kitchen Office [1] & %LITERAL_ENV%' | Format-List PaperSize
 $directory = Join-Path $env:RUNNER_TEMP 'printui-diagnostics'
 New-Item -ItemType Directory -Path $directory -Force | Out-Null
 $cases = @(
-  @{ Name = 'quoted'; Prefix = '"printui.dll,PrintUIEntry" "/Ss" "/n" "Kitchen Office [1]" "/a"'; Suffix = '"/q" "d" "u" "g"' },
-  @{ Name = 'documented'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1]" /a'; Suffix = '/q d u g' },
-  @{ Name = 'global'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1]" /a'; Suffix = '/q d g' },
-  @{ Name = 'minimal'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1]" /a'; Suffix = '/q m' },
-  @{ Name = 'default'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1]" /a'; Suffix = '/q' }
+  @{ Name = 'quoted'; Prefix = '"printui.dll,PrintUIEntry" "/Ss" "/n" "Kitchen Office [1] & %LITERAL_ENV%" "/a"'; Suffix = '"/q" "d" "u" "g"' },
+  @{ Name = 'documented'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1] & %LITERAL_ENV%" /a'; Suffix = '/q d u g' },
+  @{ Name = 'global'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1] & %LITERAL_ENV%" /a'; Suffix = '/q d g' },
+  @{ Name = 'minimal'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1] & %LITERAL_ENV%" /a'; Suffix = '/q m' },
+  @{ Name = 'default'; Prefix = 'printui.dll,PrintUIEntry /Ss /n "Kitchen Office [1] & %LITERAL_ENV%" /a'; Suffix = '/q' }
 )
 foreach ($case in $cases) {
   $output = Join-Path $directory ($case.Name + '.bin')
