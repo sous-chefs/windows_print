@@ -112,7 +112,24 @@ describe 'windows_print_printer_settings' do
 
   it 'restores an existing backup and passes arguments separately' do
     expect(chef_run).to run_execute('Restore printer settings Office')
-    expect(chef_run.execute('Restore printer settings Office').command).to include('/Sr', '/a', 'C:/backups/office.bin', '/q')
+    expect(chef_run.execute('Restore printer settings Office').command).to include('/Sr', '/a', 'C:\\backups\\office.bin', '/q')
+  end
+
+  context 'creating a backup' do
+    recipe do
+      windows_print_printer_settings 'Office' do
+        path 'C:/backups'
+        file 'office.bin'
+        action :create
+      end
+    end
+
+    it 'uses native Windows path separators and verifies the backup' do
+      expect(chef_run.execute('Back up printer settings Office').command).to include('C:\\backups\\office.bin')
+      expect(chef_run).to run_ruby_block('Verify printer settings backup Office')
+      allow(File).to receive(:file?).with('C:/backups/office.bin').and_return(false)
+      expect { chef_run.ruby_block('Verify printer settings backup Office').block.call }.to raise_error(/did not create a non-empty backup/)
+    end
   end
 
   context 'when the backup is missing' do

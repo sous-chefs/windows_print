@@ -44,7 +44,7 @@ action :restore do
   raise "Printer #{new_resource.printer_name} does not exist" unless print_state(:printer, new_resource.printer_name)
 
   execute "Restore printer settings #{new_resource.printer_name}" do
-    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Sr', '/n', new_resource.printer_name, '/a', settings, 'd', 'u', 'g', 'r', '/q']
+    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Sr', '/n', new_resource.printer_name, '/a', settings.tr('/', '\\'), 'd', 'u', 'g', 'r', '/q']
   end
 end
 
@@ -55,8 +55,15 @@ action :create do
     recursive true
   end
 
+  settings = ::File.join(new_resource.path, new_resource.file)
   execute "Back up printer settings #{new_resource.printer_name}" do
-    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Ss', '/n', new_resource.printer_name, '/a', ::File.join(new_resource.path, new_resource.file), 'd', 'u', 'g', '/q']
+    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Ss', '/n', new_resource.printer_name, '/a', settings.tr('/', '\\'), 'd', 'u', 'g', '/q']
+  end
+
+  ruby_block "Verify printer settings backup #{new_resource.printer_name}" do
+    block do
+      raise "PrintUI did not create a non-empty backup at #{settings}" unless ::File.file?(settings) && ::File.size(settings).positive?
+    end
   end
 end
 

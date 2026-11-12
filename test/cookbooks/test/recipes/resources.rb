@@ -34,7 +34,13 @@ powershell_script 'Set baseline printer paper size' do
 end
 
 powershell_script 'Change printer settings before restoring' do
-  code "Set-PrintConfiguration -PrinterName 'Kitchen Office [1]' -PaperSize A4 -ErrorAction Stop"
+  code <<~POWERSHELL
+    $ErrorActionPreference = 'Stop'
+    Set-PrintConfiguration -PrinterName 'Kitchen Office [1]' -PaperSize A4 -ErrorAction Stop
+    if ((Get-PrintConfiguration -PrinterName 'Kitchen Office [1]').PaperSize -ne 'A4') {
+      throw 'The fixture did not change the paper size before restore'
+    }
+  POWERSHELL
   not_if { ::File.exist?(marker) }
   notifies :restore, 'windows_print_printer_settings[restore]', :immediately
 end
