@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
 # Cookbook:: windows_print
@@ -26,82 +28,95 @@
 #
 
 unified_mode true
+provides :windows_print_printer
 
 property :printer_name, String, name_property: true
-property :driver_name, String, required: true
-property :ports, Hash, required: true
+property :driver_name, String
+property :ports, Hash, default: {}
 property :port_name, String
 property :ipv4_address, String
-property :share_name, String
-property :location, String
-property :comment, String
-
-# Required for driver creation
+property :share_name, String, default: ''
+property :location, String, default: ''
+property :comment, String, default: ''
 property :version, String, default: 'Type 3 - User Mode'
 property :environment, String, default: 'x64'
 property :inf_path, String
 property :inf_file, String
-property :domain_username, String
-property :domain_password, String
 
 action :create do
-  converge_by("Creating Printer Port #{new_resource.port_name}, #{new_resource.ipv4_address}") do # Does not report correctly
-    new_resource.ports.each do |port_name, ipv4_address|
-      windows_print_port port_name do
-        ipv4_address ipv4_address
-      end
+  raise ArgumentError, 'driver_name is required to create a printer' unless new_resource.driver_name
+
+  ports = new_resource.ports.dup
+  if new_resource.port_name
+    raise ArgumentError, 'Use ports or port_name, not both' unless ports.empty?
+    ports[new_resource.port_name] = new_resource.ipv4_address
+  end
+  raise ArgumentError, 'At least one printer port is required' if ports.empty?
+  raise ArgumentError, 'Port names cannot contain commas' if ports.keys.any? { |name| name.to_s.include?(',') }
+
+  ports.each do |name, address|
+    next unless address
+
+    windows_print_port name do
+      ipv4_address address
     end
   end
 
-  converge_by("Installing Printer Driver #{new_resource.driver_name}") do
-    windows_print_driver new_resource.driver_name do
-      inf_path new_resource.inf_path
-      inf_file new_resource.inf_file
-      domain_username new_resource.domain_username if new_resource.domain_password
-      domain_password new_resource.domain_password if new_resource.domain_password
-    end
+  windows_print_driver new_resource.driver_name do
+    inf_path new_resource.inf_path if new_resource.inf_path
+    inf_file new_resource.inf_file if new_resource.inf_file
+    environment new_resource.environment
+    version new_resource.version
   end
 
-  if printer_exists?
-    Chef::Log.debug("\"#{new_resource.printer_name}\" printer already created - nothing to do.")
-  else
-    if new_resource.ports.keys.count > 1
-      port_list = new_resource.ports.keys.join(',').to_s
+  current = print_state(:printer, new_resource.printer_name)
+  desired = {
+    'DriverName' => new_resource.driver_name,
+    'PortName' => ports.keys.join(','),
+    'Comment' => new_resource.comment,
+    'Location' => new_resource.location,
+    'Shared' => !new_resource.share_name.empty?,
+  }
+  desired['ShareName'] = new_resource.share_name unless new_resource.share_name.empty?
+  changed = !current || desired.any? do |key, value|
+    if key == 'PortName'
+      current[key].to_s.downcase.split(',').sort != value.downcase.split(',').sort
+    elsif key == 'DriverName'
+      !current[key].to_s.casecmp?(value)
     else
-      port_list = new_resource.ports.keys.to_s
-      port_list = port_list.delete! '"[]'
+      current[key] != value && !(value == '' && current[key].nil?)
     end
+  end
 
-    converge_by("Create Printer #{new_resource.printer_name}") do
-      cmd = "Add-Printer -Name \"#{new_resource.printer_name}\" -DriverName \"#{new_resource.driver_name}\" -PortName \"#{port_list}\" -Comment \"#{new_resource.comment}\" -Location \"#{new_resource.location}\""
-
-      if new_resource.share_name == ''
-        Chef::Log.debug("\"#{new_resource.printer_name}\" printer will not be shared.")
-      else
-        cmd << " -Shared -ShareName \"#{new_resource.share_name}\""
-        Chef::Log.debug("\"#{new_resource.printer_name}\" shared as \"#{new_resource.share_name}\".")
-      end
-
-      powershell_out!(cmd).run_command
+  if changed
+    args = desired.reject { |key, _| key == 'Shared' }.map { |key, value| "-#{key} #{ps_literal(value)}" }.join(' ')
+    code = if current
+             assignments = desired.map { |key, value| "$target.#{key} = #{key == 'Shared' ? "$#{value}" : ps_literal(value)}" }.join("\n")
+             <<~POWERSHELL
+               $ErrorActionPreference = 'Stop'
+               $target = #{print_selection(:printer, new_resource.printer_name)}
+               if ($null -eq $target) { throw 'Printer disappeared before it could be updated' }
+               #{assignments}
+               Set-Printer -InputObject $target -ErrorAction Stop
+             POWERSHELL
+           else
+             shared = desired['Shared'] ? ' -Shared' : ''
+             "$ErrorActionPreference = 'Stop'; Add-Printer -Name #{ps_literal(new_resource.printer_name)} #{args}#{shared} -ErrorAction Stop"
+           end
+    powershell_script "Configure printer #{new_resource.printer_name}" do
+      code code
     end
   end
 end
 
 action :delete do
-  if printer_exists?
-    converge_by("Deleting Printer #{new_resource.printer_name}") do
-      powershell_script new_resource.printer_name do
-        code "Remove-Printer -Name \"#{new_resource.printer_name}\""
-      end
+  if print_state(:printer, new_resource.printer_name)
+    powershell_script "Delete printer #{new_resource.printer_name}" do
+      code mutate_print_object(:printer, new_resource.printer_name, 'Remove-Printer')
     end
-  else
-    Chef::Log.debug("\"#{new_resource.printer_name}\" printer not found - unable to delete.")
   end
 end
 
 action_class do
-  def printer_exists?
-    check = powershell_out("Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.printer_name}'} | fl name").run_command
-    check.stdout.include?(new_resource.printer_name)
-  end
+  include WindowsPrintCookbook::Helpers
 end

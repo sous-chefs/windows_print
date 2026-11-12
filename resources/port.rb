@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
 # Cookbook:: windows_print
@@ -26,40 +28,40 @@
 #
 
 unified_mode true
+provides :windows_print_port
 
 property :port_name, String, name_property: true
 property :ipv4_address, String, regex: Resolv::IPv4::Regex
-property :ports, Hash
 
 action :create do
-  if port_exists?
-    Chef::Log.debug("#{new_resource.port_name} already created - nothing to do.")
-  else
-    converge_by "Create Printer Port #{new_resource.port_name}" do
-      powershell_script new_resource.port_name do
-        code "Add-PrinterPort -Name \"#{new_resource.port_name}\" -PrinterHostAddress \"#{new_resource.ipv4_address}\""
-      end
-    end
+  raise ArgumentError, 'ipv4_address is required to create a TCP/IP port' unless new_resource.ipv4_address
 
-    Chef::Log.debug("#{new_resource.port_name} created.")
+  current = print_state(:port, new_resource.port_name)
+  if current.nil?
+    powershell_script "Create printer port #{new_resource.port_name}" do
+      code "$ErrorActionPreference = 'Stop'; Add-PrinterPort -Name #{ps_literal(new_resource.port_name)} -PrinterHostAddress #{ps_literal(new_resource.ipv4_address)} -ErrorAction Stop"
+    end
+  elsif current['PrinterHostAddress'].to_s.empty?
+    raise "Port #{new_resource.port_name} exists but is not a TCP/IP printer port"
+  elsif current['PrinterHostAddress'] != new_resource.ipv4_address
+    raise ArgumentError, 'Port names beginning with // cannot be passed safely to Windows Script Host' if new_resource.port_name.start_with?('//')
+
+    script = printer_admin_script('prnport.vbs')
+    invocation = native_powershell(windows_executable('cscript.exe'), ['//B', '//NoLogo', script, '-t', '-r', new_resource.port_name, '-h', new_resource.ipv4_address], script_host: true)
+    powershell_script "Configure printer port #{new_resource.port_name}" do
+      code invocation
+    end
   end
 end
 
 action :delete do
-  if port_exists?
-    converge_by "Remove Printer Port #{new_resource.port_name}" do
-      powershell_script new_resource.port_name do
-        code "Remove-PrinterPort -Name \"#{new_resource.port_name}\""
-      end
+  if print_state(:port, new_resource.port_name)
+    powershell_script "Delete printer port #{new_resource.port_name}" do
+      code mutate_print_object(:port, new_resource.port_name, 'Remove-PrinterPort')
     end
-  else
-    Chef::Log.debug("#{new_resource.port_name} not found - unable to delete.")
   end
 end
 
 action_class do
-  def port_exists?
-    check = powershell_out("Get-wmiobject -Class Win32_TCPIPPrinterPort -EnableAllPrivileges | where {$_.name -like '#{new_resource.port_name}'} | fl name").run_command
-    check.stdout.include?(new_resource.port_name)
-  end
+  include WindowsPrintCookbook::Helpers
 end
