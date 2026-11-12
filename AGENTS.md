@@ -6,7 +6,7 @@
 * Original PR 50 run 43177104396 completed before prepared fix 506f2af was pushed, as the user required. Keep that release branch separate while developing the major migration. Do not touch the shared Windows VM.
 * Retain existing release publishing destinations. The OCI-only restriction applies to the distinct firewalld cookbook.
 * Keep Distributed Scan's legacy Server 2012 R2/2016 domain-member behaviour. It was removed in Server 2019; modern Windows CI can verify only its unavailable-platform path.
-* Network credential properties are ineffective in the original implementation. Owner decision is pending; do not silently add impersonation or remove them before that decision.
+* The owner chose to remove the ineffective network credential properties. The Chef/Cinc execution account must have access to network shares; do not add implicit impersonation.
 * Backup and restore are operational actions. Callers can use notifications with `action :nothing`; they are not configuration-state resources.
 
 ## Native Windows behaviour

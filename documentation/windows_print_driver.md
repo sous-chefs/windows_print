@@ -26,3 +26,6 @@ driver of the requested name, environment and type is left unchanged.
 Delete requires no INF files. Windows rejects deleting a driver still used by a
 queue. The resource retains the shared driver-store package. It does not perform
 in-place package upgrades based on an INF checksum or package version.
+
+The Chef/Cinc execution account must have read access to the driver package,
+including any network share. Separate username/password properties are not supported.

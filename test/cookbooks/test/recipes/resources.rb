@@ -14,6 +14,16 @@ end
 backup_dir = ::File.join(Chef::Config[:file_cache_path], 'printer-backup')
 marker = ::File.join(backup_dir, 'roundtrip-complete')
 
+directory backup_dir do
+  recursive true
+end
+
+# A successful fresh export must replace an existing backup on Windows too.
+file ::File.join(backup_dir, 'settings.bin') do
+  content 'Previous backup: replace only after a fresh export succeeds'
+  action :create_if_missing
+end
+
 windows_print_printer_settings 'backup' do
   printer_name 'Kitchen Office [1]'
   path backup_dir

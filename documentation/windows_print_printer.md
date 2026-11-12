@@ -28,3 +28,6 @@ be used as an individual port name.
 
 Delete requires only the queue name. Shared drivers and ports remain installed;
 remove them with their own resources after deleting all queues that use them.
+
+Driver packages on network shares must be accessible to the Chef/Cinc execution
+account. The resource does not accept separate network credentials.

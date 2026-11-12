@@ -42,8 +42,6 @@ property :version, String, default: 'Type 3 - User Mode'
 property :environment, String, default: 'x64'
 property :inf_path, String
 property :inf_file, String
-property :domain_username, String
-property :domain_password, String, sensitive: true
 
 action :create do
   raise ArgumentError, 'driver_name is required to create a printer' unless new_resource.driver_name

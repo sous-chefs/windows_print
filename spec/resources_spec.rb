@@ -80,7 +80,7 @@ describe 'windows_print_port' do
 
   it 'updates an existing TCP port without removing its queues' do
     expect(chef_run).to run_powershell_script('Configure printer port Office TCP')
-    expect(chef_run.powershell_script('Configure printer port Office TCP').code).to include('"-t" "-r" "Office TCP" "-h" "192.0.2.10"')
+    expect(chef_run.powershell_script('Configure printer port Office TCP').code).to include('-t -r "Office TCP" -h 192.0.2.10')
   end
 
   context 'when already configured' do
@@ -112,7 +112,7 @@ describe 'windows_print_printer_settings' do
 
   it 'restores an existing backup and passes arguments separately' do
     expect(chef_run).to run_powershell_script('Restore printer settings Office')
-    expect(chef_run.powershell_script('Restore printer settings Office').code).to include('"/Sr"', '"/a"', 'C:\\backups\\office.bin', '"/q" "d" "u" "g" "r"')
+    expect(chef_run.powershell_script('Restore printer settings Office').code).to include('/Sr', '/a', 'C:\\backups\\office.bin', '/q d u g r')
   end
 
   context 'creating a backup' do

@@ -15,8 +15,6 @@ property :inf_path, String
 property :inf_file, String
 property :version, String, default: 'Type 3 - User Mode', equal_to: ['Type 3 - User Mode', 'Type 2 - Kernel Mode']
 property :environment, String, default: 'x64', equal_to: %w(x64 x86 Itanium)
-property :domain_username, String
-property :domain_password, String, sensitive: true
 
 action :install do
   environment = printer_environment(new_resource.environment)

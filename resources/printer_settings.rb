@@ -33,8 +33,6 @@ provides :windows_print_printer_settings
 property :printer_name, String, name_property: true
 property :path, String, required: true
 property :file, String, required: true
-property :domain_username, String
-property :domain_password, String, sensitive: true
 
 default_action :restore
 

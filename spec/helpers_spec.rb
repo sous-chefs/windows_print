@@ -37,8 +37,13 @@ describe WindowsPrintCookbook::Helpers do
     expect { helper.print_state(:printer, 'Office') }.to raise_error(/more than one/)
   end
 
-  it 'quotes every native argument, including shell metacharacters and empty values' do
+  it 'quotes native arguments containing shell metacharacters and empty values' do
     expect(helper.windows_arguments(['one&two', 'one|two', '%LITERAL_ENV%', '', 'two words'])).to eq '"one&two" "one|two" "%LITERAL_ENV%" "" "two words"'
+  end
+
+  it 'keeps simple syntax tokens bare for the PrintUI parser' do
+    expect(helper.windows_arguments(['printui.dll,PrintUIEntry', '/Ss', '/q', 'd', 'u', 'g'])).to eq 'printui.dll,PrintUIEntry /Ss /q d u g'
+    expect(helper.windows_arguments(['a>b', 'a<b', 'a^b', 'a;b', 'a$b'])).to eq '"a>b" "a<b" "a^b" "a;b" "a$b"'
   end
 
   it 'preserves quotes and trailing backslashes under Windows argument parsing' do

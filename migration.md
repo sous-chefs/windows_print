@@ -25,6 +25,7 @@ The `windows_print_driver`, `windows_print_port`, `windows_print_printer` and
 * Names are matched literally. Wildcards no longer select additional queues, ports or drivers.
 * Driver `version` is the Windows driver type, not a package version. The installed type must match the requested type. Updating a driver package with an unchanged name remains an operator-managed operation.
 * The unused `ports` property on `windows_print_port` has been removed. Use one resource per port. The printer resource still accepts a `ports` hash.
+* The ineffective `domain_username` and `domain_password` properties have been removed from driver, printer and printer-settings resources. Remove them from resource declarations. Run Chef/Cinc under an account with the required access to network shares used for driver packages or backups; the cookbook does not impersonate another account.
 
 ## Settings backup and restore
 
@@ -32,6 +33,8 @@ Both operations run when invoked. Use `action :nothing` and notifications when
 they should run only after another resource changes. Restore now requires an
 existing backup and printer, and fails clearly if either is missing.
 It no longer silently skips a valid backup.
+Backup writes a fresh temporary file, validates that it is non-empty, then
+replaces the selected backup. A failed export preserves the previous backup.
 
 ## Platforms
 

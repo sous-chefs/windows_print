@@ -50,12 +50,14 @@ module WindowsPrintCookbook
       script
     end
 
-    # Start-Process accepts one Windows command-line string. Quote every value
-    # according to CommandLineToArgvW rules, then keep that string literal in PS.
+    # Start-Process accepts one Windows command-line string. PrintUI requires its
+    # syntax tokens bare. Quote all other values using Windows argument rules,
+    # then keep the complete command line literal in PowerShell (never cmd.exe).
     def windows_arguments(arguments)
       arguments.map do |value|
         argument = value.to_s
         raise ArgumentError, 'Native arguments cannot contain NUL bytes' if argument.include?("\0")
+        next argument if argument.match?(%r{\A[a-zA-Z0-9_.,:/-]+\z})
 
         escaped = argument.gsub(/(\\*)"/) { "#{Regexp.last_match(1) * 2}\\\"" }
         trailing = escaped[/\\+\z/]
