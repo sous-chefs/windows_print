@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Derek Groh (<dgroh@arch.tamu.edu>)
 # Cookbook:: windows_print
@@ -26,49 +28,44 @@
 #
 
 unified_mode true
+provides :windows_print_printer_settings
 
 property :printer_name, String, name_property: true
 property :path, String, required: true
 property :file, String, required: true
 property :domain_username, String
-property :domain_password, String
+property :domain_password, String, sensitive: true
+
+default_action :restore
 
 action :restore do
-  converge_by "Restore printer settings for #{new_resource.printer_name}" do
-    if printer_exists?
-      if file_exists?
-        Chef::Log.debug("\"#{new_resource.file}\" does not exist - skipping.")
-      else
-        execute new_resource.printer_name do
-          command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Sr /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8 r"
-          not_if { ::File.exist?("#{new_resource.path}\\#{new_resource.file}") }
-        end
-      end
-    else
-      Chef::Log.debug("\"#{new_resource.printer_name}\" printer not found - unable to restore settings.")
-    end
+  settings = ::File.join(new_resource.path, new_resource.file)
+  raise "Printer settings file #{settings} does not exist" unless ::File.file?(settings)
+  raise "Printer #{new_resource.printer_name} does not exist" unless print_state(:printer, new_resource.printer_name)
+
+  execute "Restore printer settings #{new_resource.printer_name}" do
+    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Sr', '/n', new_resource.printer_name, '/a', settings, 'd', 'u', 'g', 'r', '/q']
   end
 end
 
 action :create do
-  converge_by "Create printer settings for #{new_resource.printer_name}" do
-    if printer_exists?
-      execute "Create #{new_resource.printer_name}.bin" do
-        command "RUNDLL32 PRINTUI.DLL,PrintUIEntry /Ss /n \"#{new_resource.printer_name}\" /a \"#{new_resource.path}\\#{new_resource.file}\" d u g 8"
-      end
-    else
-      Chef::Log.debug("\"#{new_resource.printer_name}\" printer not found - unable to create settings.")
-    end
+  raise "Printer #{new_resource.printer_name} does not exist" unless print_state(:printer, new_resource.printer_name)
+
+  directory new_resource.path do
+    recursive true
+  end
+
+  execute "Back up printer settings #{new_resource.printer_name}" do
+    command ['rundll32.exe', 'printui.dll,PrintUIEntry', '/Ss', '/n', new_resource.printer_name, '/a', ::File.join(new_resource.path, new_resource.file), 'd', 'u', 'g', '/q']
+  end
+end
+
+action :delete do
+  file ::File.join(new_resource.path, new_resource.file) do
+    action :delete
   end
 end
 
 action_class do
-  def printer_exists?
-    check = powershell_out("Get-wmiobject -Class Win32_Printer -EnableAllPrivileges | where {$_.name -like '#{new_resource.printer_name}'} | fl name").run_command
-    check.stdout.include?(new_resource.printer_name)
-  end
-
-  def file_exists?
-    ::File.exist?("#{new_resource.path}\\#{new_resource.file}")
-  end
+  include WindowsPrintCookbook::Helpers
 end
