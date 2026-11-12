@@ -22,7 +22,8 @@ try {
     $process = Start-Process -FilePath "$env:SystemRoot\System32\rundll32.exe" -ArgumentList $arguments -NoNewWindow -PassThru
     if (-not $process.WaitForExit(15000)) {
       $process.Kill()
-      throw 'Name probe export did not exit'
+      Write-Output 'Name probe export did not exit within 15 seconds'
+      continue
     }
     if (Test-Path -LiteralPath $output) {
       Get-Item -LiteralPath $output | Select-Object Name, Length
@@ -31,7 +32,8 @@ try {
       $process = Start-Process -FilePath "$env:SystemRoot\System32\rundll32.exe" -ArgumentList $arguments -NoNewWindow -PassThru
       if (-not $process.WaitForExit(15000)) {
         $process.Kill()
-        throw 'Name probe restore did not exit'
+        Write-Output 'Name probe restore did not exit within 15 seconds'
+        continue
       }
       Write-Output "Restored paper: $((Get-PrintConfiguration -PrinterName $name).PaperSize)"
     } else {
